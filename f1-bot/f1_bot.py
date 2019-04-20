@@ -6,35 +6,6 @@ from discord.ext import commands
 
 from SeeSharp import Console
 
-id_count = 0
-
-def log(type, msg):
-    global id_count
-
-    print(f"> {type} ({id_count}): {msg}")
-    id_count += 1
-    return
-
-Console.StartColor(Console.Color.Foreground.LIGHTRED())
-
-log("sys", "Reading files...")
-
-_temp_file = open("usr.cfg",mode='r')
-USER_CFG = _temp_file.readlines()
-_temp_file.close()
-
-#date|location|FP1|FP2|FP3|Qualifying|Race, Race HU|
-_temp_file = open("f1_calendar.txt",mode='r')
-F1CALENDAR = _temp_file.readlines()
-_temp_file.close()
-
-log("sys", "Loading...")
-
-HELP_LIST = str("Teljes információ az elkövetkező verseny hétről: --this_week \n"+
-                "Teljes információ a következő utáni verseny hétről: --next_week \n"+
-                "Előző hét top 10: --last_weeks_top10 \n"+
-                "Random Kimi: --bwoah")
-
 client = commands.Bot(command_prefix = '--')
 
 @client.event
@@ -176,12 +147,31 @@ def str_extra0(num):
 
     return _r
 
-def get_token():
-    for l in USER_CFG:
-        if l.split(':')[0] == "token":
-            return str(l.split(':')[1])
+id_count = 0
 
-    print("Error: No token found in usr.cfg")
-    return ""
+def log(type, msg):
+    global id_count
 
-client.run(get_token())
+    print(f"> {type} ({id_count}): {msg}")
+    id_count += 1
+    return
+
+Console.StartColor(Console.Color.Foreground.LIGHTRED())
+
+log("sys", "Reading files...")
+
+USER_CFG = {k:v for k, v in (l.split(':') for l in open("usr.cfg"))}
+
+#date|location|FP1|FP2|FP3|Qualifying|Race, Race HU|
+_temp_file = open(USER_CFG.get("fallback_calendar"), mode='r')
+F1CALENDAR = _temp_file.readlines()
+_temp_file.close()
+
+log("sys", "Loading...")
+
+HELP_LIST = str("Teljes információ az elkövetkező verseny hétről: --this_week \n"+
+                "Teljes információ a következő utáni verseny hétről: --next_week \n"+
+                "Előző hét top 10: --last_weeks_top10 \n"+
+                "Random Kimi: --bwoah")
+
+client.run(USER_CFG.get("token"))
