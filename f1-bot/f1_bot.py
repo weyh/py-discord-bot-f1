@@ -1,12 +1,13 @@
-import os
-from random import randrange
-from datetime import datetime
-import discord
+import os, requests, discord
 from discord.ext import commands
-
+from bs4 import BeautifulSoup
+from datetime import datetime
+from pytz import timezone
+from random import randrange
 from SeeSharp import Console
 
 client = commands.Bot(command_prefix = '--')
+TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
 
 @client.event
 async def on_ready():    
@@ -21,14 +22,14 @@ async def on_ready():
 async def on_message(message):
     
     if message.content[:2] == "--":
-        if message.content[2:].find("this_week") != -1:
-            await this_week(message)
+        if message.content[2:].find("upcoming") != -1:
+            await upcoming(message)
 
         if message.content[2:].find("next_week") != -1:
             await next_week(message)
 
-        if message.content[2:].find("last_weeks_top10") != -1:
-            await last_weeks_top10(message)
+        if message.content[2:].find("last_top10") != -1:
+            await last_top10(message)
 
         if message.content[2:].find("bwoah") != -1:
             await bwoah(message)
@@ -38,41 +39,91 @@ async def on_message(message):
             await message.channel.send(HELP_LIST)
     return
 
-async def this_week(message):
-    race_line = ""
+async def upcoming(message):
+    race_info = ""
     i=0
 
-    for line in F1CALENDAR:
-        current_date = datetime.now()
-        date_of_race = datetime.strptime(str(line.split('|')[0]), '%Y-%m-%d')
+    if not isSiteUp():
+        for line in F1CALENDAR_FALLBACK:
+            current_date = datetime.now()
+            date_of_race = datetime.strptime(str(line.split('|')[0]), '%Y-%m-%d')
 
-        race_h = int(line.split('|')[6].split(',')[1].split(':')[0])        
-        current_h = int(current_date.hour)
+            race_h = int(line.split('|')[6].split(',')[1].split(':')[0])        
+            current_h = int(current_date.hour)
         
-        if date_of_race >= current_date:
-            race_line = line
+            if date_of_race >= current_date:
+                race_info = line
 
-            if current_h >= race_h and date_of_race == current_date:
-                race_line = F1CALENDAR[i+1]
+                if current_h >= race_h and date_of_race == current_date:
+                    race_info = F1CALENDAR_FALLBACK[i+1]
 
-            break
+                break
 
-        i += 1
+            i += 1
+        
+        log("upcoming", "OFFLINE")
+        race_info = sytle_text(race_info)
+    else:
+        show_format_1 = "%a %d %b %H:%M"
+        show_format_2 = "%H:%M"
+        current_date = datetime.now()
 
-    log("this_week", "\n"+sytle_text(race_line))            
-    await send_msg(message, sytle_text(race_line))
+        page = requests.get('https://www.autosport.com/f1')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        coming_up_div = soup.find_all('div', class_='stats')[1]
+
+        location = [d.get_text() for d in coming_up_div.select("span")][1].split(' / ')[0]
+        date = [d.get_text() for d in coming_up_div.select("span")][1].split(' / ')[1]
+
+        schedule_start = [d.find("td", class_="text-right").get("data-start") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
+        schedule_end = [d.find("td", class_="text-right").get("data-end") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
+        
+        #todo: refactor with dictionary
+
+        free_practices_start = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_start[:3]]
+        free_practices_end = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_end[:3]]
+        qualifyings_start = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_start[3:6]]
+        qualifyings_end = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_end[3:6]]
+        race_start = localTime(datetime.strptime(schedule_start[6], TIME_FORMAT))
+        race_end = localTime(datetime.strptime(schedule_end[6], TIME_FORMAT))
+
+        race_starts_in = str(race_start - datetime.now(timezone(USER_CFG.get('timezone')))).split('.')[0]
+        circuit = [d.get_text() for d in coming_up_div.select("ul li")][1].split(': ')[1]
+        track = [d.get_text() for d in coming_up_div.select("ul li")][2].split(': ')[1]
+
+        race_info = "COMING UP:\n"
+        race_info += f"{location} / {date}\n"
+        race_info += f"Race starts in: {race_starts_in}\n"
+        race_info += f"Circuit: {circuit}\n"
+        race_info += f"Track information: {track}\n"
+        race_info += "\nSCHEDULE:\n"
+        
+        for i in range(3):
+            race_info += f"FP{i+1}: {free_practices_start[i].strftime(show_format_1)} - {free_practices_end[i].strftime(show_format_2)}\n"
+
+        race_info += "\n"
+
+        for i in range(3):
+            race_info += f"Q{i+1}: {qualifyings_start[i].strftime(show_format_1)} - {qualifyings_end[i].strftime(show_format_2)}\n"
+
+        race_info += "\n"
+
+        race_info += f"Race: {race_start.strftime(show_format_1)} - {race_end.strftime(show_format_2)}\n"         
+
+    log("upcoming", "\n"+race_info)          
+    await send_msg(message, race_info)
     return
 
 async def next_week(message):
     race_line = ""
     i=0
 
-    for line in F1CALENDAR:
+    for line in F1CALENDAR_FALLBACK:
         current_date = datetime.now()
         date_of_race = datetime.strptime(str(line.split('|')[0]), '%Y-%m-%d')
 
         if date_of_race >= current_date:
-            race_line = F1CALENDAR[i+1]
+            race_line = F1CALENDAR_FALLBACK[i+1]
             break
 
         i += 1
@@ -81,10 +132,7 @@ async def next_week(message):
     await send_msg(message, sytle_text(race_line))
     return
 
-async def last_weeks_top10(message):
-    from bs4 import BeautifulSoup
-    import requests
-
+async def last_top10(message):
     r_text = ""
 
     page = requests.get('https://www.autosport.com/f1')
@@ -156,22 +204,33 @@ def log(type, msg):
     id_count += 1
     return
 
+def localTime(time):
+    return time.astimezone(timezone(USER_CFG.get('timezone')))
+
+def isSiteUp():
+    return requests.head('https://www.autosport.com/f1').status_code == 200
+
 Console.StartColor(Console.Color.Foreground.LIGHTRED())
 
 log("sys", "Reading files...")
 
-USER_CFG = {k:v for k, v in (l.split(':') for l in open("usr.cfg"))}
+USER_CFG = {k:v[:-1] for k, v in (l.split(':') for l in open("usr.cfg"))} # there is a \n somehow
 
 #date|location|FP1|FP2|FP3|Qualifying|Race, Race HU|
-_temp_file = open(USER_CFG.get("fallback_calendar"), mode='r')
-F1CALENDAR = _temp_file.readlines()
+_temp_file = open(USER_CFG.get("fallback_calendar"), mode='r') 
+F1CALENDAR_FALLBACK = _temp_file.readlines()
 _temp_file.close()
 
 log("sys", "Loading...")
 
-HELP_LIST = str("Teljes információ az elkövetkező verseny hétről: --this_week \n"+
-                "Teljes információ a következő utáni verseny hétről: --next_week \n"+
-                "Előző hét top 10: --last_weeks_top10 \n"+
+log("sys", f"Token found: {len(USER_CFG.get('token')) != 0}")
+log("sys", f"Time zone: {USER_CFG.get('timezone')}")
+log("sys", f"Fallback calendar: {USER_CFG.get('fallback_calendar')}")
+log("sys", f"Site up: {isSiteUp()}")
+
+HELP_LIST = str("Upcoming race weekend: --upcoming \n"+
+                "The race weekend after the upcoming one: --next_week \n"+
+                "Top 10 from last race: --last_top10 \n"+
                 "Random Kimi: --bwoah")
 
 client.run(USER_CFG.get("token"))
