@@ -11,4 +11,4 @@ Gives information on upcoming or previous f1 events.
 [Bak Gergely János](https://github.com/weyh)
 
 ## Licensz
-This project is licensed under the Apache License 2.0 - see the [Apache License 2.0](LICENSE) file for details.
+This project is licensed under the MIT License - see the [MIT License](LICENSE) file for details.
