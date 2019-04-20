@@ -10,5 +10,5 @@ Gives information on upcoming or previous f1 events.
 
 [Bak Gergely János](https://github.com/weyh)
 
-## Licensz
+## License
 This project is licensed under the MIT License - see the [MIT License](LICENSE) file for details.
