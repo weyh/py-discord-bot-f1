@@ -4,18 +4,19 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pytz import timezone
 from random import randrange
-from SeeSharp import Console
+from colorama import Fore
+
+from debug import Debug
 
 client = commands.Bot(command_prefix = '--')
 TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
 
 @client.event
 async def on_ready():    
-    Console.EndColor()
-    Console.Clear()
-    log("sys", "Bot is ready")
-    log("sys", "Logging started:")
-    print("----------------")
+    Debug.Clear()
+    Debug.Warning("SYS", "Bot is ready")
+    Debug.Warning("SYS", "Logging started...")
+    Debug.Print("----------------")
     return
 
 @client.event
@@ -23,47 +24,30 @@ async def on_message(message):
     
     if message.content[:2] == "--":
         if message.content[2:].find("upcoming") != -1:
+            Debug.Log(f"user: {message.author}", "Started upcoming")
             await upcoming(message)
 
         if message.content[2:].find("next_week") != -1:
+            Debug.Log(f"user: {message.author}", "Started next_week")
             await next_week(message)
 
         if message.content[2:].find("last_top10") != -1:
+            Debug.Log(f"user: {message.author}", "Started last_top10")
             await last_top10(message)
 
         if message.content[2:].find("bwoah") != -1:
+            Debug.Log(f"user: {message.author}", "Started bwoah")
             await bwoah(message)
 
         if message.content[2:].find("help") != -1:
-            log("help", "help was called")
+            Debug.Print(f">> user: {message.author} > Help was called")
             await message.channel.send(HELP_LIST)
     return
 
 async def upcoming(message):
     race_info = ""
-    i=0
 
-    if not isSiteUp():
-        for line in F1CALENDAR_FALLBACK:
-            current_date = datetime.now()
-            date_of_race = datetime.strptime(str(line.split('|')[0]), '%Y-%m-%d')
-
-            race_h = int(line.split('|')[6].split(',')[1].split(':')[0])        
-            current_h = int(current_date.hour)
-        
-            if date_of_race >= current_date:
-                race_info = line
-
-                if current_h >= race_h and date_of_race == current_date:
-                    race_info = F1CALENDAR_FALLBACK[i+1]
-
-                break
-
-            i += 1
-        
-        log("upcoming", "OFFLINE")
-        race_info = sytle_text(race_info)
-    else:
+    if isSiteUp():
         show_format_1 = "%a %d %b %H:%M"
         show_format_2 = "%H:%M"
         current_date = datetime.now()
@@ -108,46 +92,62 @@ async def upcoming(message):
 
         race_info += "\n"
 
-        race_info += f"Race: {race_start.strftime(show_format_1)} - {race_end.strftime(show_format_2)}\n"         
-
-    log("upcoming", "\n"+race_info)          
+        race_info += f"Race: {race_start.strftime(show_format_1)} - {race_end.strftime(show_format_2)}\n"
+        
+        Debug.Log("upcoming", race_info)
+    else:
+        Debug.Error("SYS (upcoming)", "Site is down")
+        race_info = "Error: Unable to reach https://www.autosport.com"
+    
     await send_msg(message, race_info)
     return
 
 async def next_week(message):
-    race_line = ""
-    i=0
+    race_info = ""
+    
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1/calendar')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
 
-    for line in F1CALENDAR_FALLBACK:
-        current_date = datetime.now()
-        date_of_race = datetime.strptime(str(line.split('|')[0]), '%Y-%m-%d')
+        i = 3
 
-        if date_of_race >= current_date:
-            race_line = F1CALENDAR_FALLBACK[i+1]
-            break
+        while i < len(calendar):
+            if len(calendar[i].contents) == 0:
+                n_race = [r.get_text() for r in calendar[i + 1:i + 4]]
+                race_info = f"Race:    {n_race[0]}\nCircuit: {n_race[1]}\nDate:    {n_race[2]}"
+                break
+            else:
+                i += 4
 
-        i += 1
+        Debug.Log("next_week", race_info)
+    else:
+        Debug.Error("SYS (next_week)", "Site is down")
+        race_info = "Error: Unable to reach https://www.autosport.com"
 
-    log("next_week", "\n" + sytle_text(race_line))            
-    await send_msg(message, sytle_text(race_line))
+    await send_msg(message, race_info)
     return
 
 async def last_top10(message):
     r_text = ""
 
-    page = requests.get('https://www.autosport.com/f1')
-    soup = BeautifulSoup(page.content, 'html.parser')
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1')
+        soup = BeautifulSoup(page.content, 'html.parser')
 
-    drivers = [d.get_text() for d in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(2) a")]
-    teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
+        drivers = [d.get_text() for d in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(2) a")]
+        teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
 
-    log("team/drivers",f"{drivers}/{teams}")
+        index = 0
 
-    index = 0
+        while index < len(drivers):
+            r_text += f"{str_extra0(index+1)}| {str(drivers[index])} - {str(teams[index])} \n"
+            index += 1
 
-    while index < len(drivers):
-        r_text += f"{str_extra0(index+1)}| {str(drivers[index])} - {str(teams[index])} \n"
-        index += 1
+        Debug.Log("last_top10", r_text)
+    else:
+        Debug.Error("SYS (last_top10)", "Site is down")
+        r_text = "Error: Unable to reach https://www.autosport.com"
 
     await send_msg(message, r_text)
     return
@@ -158,7 +158,7 @@ async def bwoah(message):
     with open("kimi.txt") as fp:
         for i, l in enumerate(fp):
             if rnd == i:
-                log("bwoah", "random kimi: " + l)
+                Debug.Log("bwoah", "random kimi: " + l)
                 await send_msg(message, l)
                 break
     return
@@ -168,12 +168,6 @@ async def send_msg(message, msg):
         msg = "Err"
     await message.channel.send(msg)
     return
-
-def sytle_text(text):
-    arr = text.split('|')
-    r_text = f"Verseny (hely/dátuma): {arr[1]}/{arr[0]} \nMagyar idő: {arr[6].split(',')[1]}Helyi idő: {arr[6].split(',')[0]} \nIdőmérő: {arr[5]} \nFP1: {arr[2]}, FP2: {arr[3]}, FP3: {arr[4]}"
-
-    return r_text
 
 def file_len(fname):
     with open(fname) as f:
@@ -195,38 +189,21 @@ def str_extra0(num):
 
     return _r
 
-id_count = 0
-
-def log(type, msg):
-    global id_count
-
-    print(f"> {type} ({id_count}): {msg}")
-    id_count += 1
-    return
-
 def localTime(time):
     return time.astimezone(timezone(USER_CFG.get('timezone')))
 
 def isSiteUp():
     return requests.head('https://www.autosport.com/f1').status_code == 200
 
-Console.StartColor(Console.Color.Foreground.LIGHTRED())
-
-log("sys", "Reading files...")
+Debug.Warning("SYS", "Reading files...")
 
 USER_CFG = {k:v[:-1] for k, v in (l.split(':') for l in open("usr.cfg"))} # there is a \n somehow
 
-#date|location|FP1|FP2|FP3|Qualifying|Race, Race HU|
-_temp_file = open(USER_CFG.get("fallback_calendar"), mode='r') 
-F1CALENDAR_FALLBACK = _temp_file.readlines()
-_temp_file.close()
+Debug.Warning("SYS", "Loading...")
 
-log("sys", "Loading...")
-
-log("sys", f"Token found: {len(USER_CFG.get('token')) != 0}")
-log("sys", f"Time zone: {USER_CFG.get('timezone')}")
-log("sys", f"Fallback calendar: {USER_CFG.get('fallback_calendar')}")
-log("sys", f"Site up: {isSiteUp()}")
+Debug.Warning("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
+Debug.Warning("SYS", f"Time zone: {USER_CFG.get('timezone')}")
+Debug.Warning("SYS", f"Site up: {isSiteUp()}")
 
 HELP_LIST = str("Upcoming race weekend: --upcoming \n"+
                 "The race weekend after the upcoming one: --next_week \n"+
