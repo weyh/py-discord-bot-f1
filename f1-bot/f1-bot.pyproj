@@ -25,7 +25,6 @@
     <Compile Include="debug.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="f1_calendar.txt" />
     <Content Include="kimi.txt" />
     <Content Include="usr.cfg" />
   </ItemGroup>

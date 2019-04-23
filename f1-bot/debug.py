@@ -19,21 +19,21 @@ class Debug(object):
 		return
 
 	@staticmethod
-	def Log(src, msg, color = Fore.LIGHTWHITE_EX):
-		print(color + "> " + src + ": " + msg)
+	def Log(src, msg):
+		print(Fore.LIGHTWHITE_EX + "> " + src + ": " + msg)
 		return
 
 	@staticmethod
-	def Warning(src, msg, color = Fore.LIGHTYELLOW_EX):
-		print(color + "> " + src + ": " + msg)
+	def Warning(src, msg):
+		print(Fore.LIGHTYELLOW_EX + "> " + src + ": " + msg)
 		return
 
 	@staticmethod
-	def Error(src, msg, color = Fore.LIGHTRED_EX):
-		print(color + "> " + src + ": " + msg)
+	def Error(src, msg):
+		print(Fore.LIGHTRED_EX + "> " + src + ": " + msg)
 		return
 
 	@staticmethod
-	def Print(msg, color = Fore.LIGHTWHITE_EX):
+	def Print(msg, color = Fore.WHITE):
 		print(color + msg)
 		return

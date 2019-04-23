@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pytz import timezone
 from random import randrange
-from colorama import Fore
+from tabulate import tabulate
 
 from debug import Debug
 
@@ -34,6 +34,14 @@ async def on_message(message):
         if message.content[2:].find("last_top10") != -1:
             Debug.Log(f"user: {message.author}", "Started last_top10")
             await last_top10(message)
+
+        if message.content[2:].find("driver_standings") != -1:
+            Debug.Log(f"user: {message.author}", "Started driver_standings")
+            await driver_standings(message)
+
+        if message.content[2:].find("constructors_standings") != -1:
+            Debug.Log(f"user: {message.author}", "Started constructors_standings")
+            await constructors_standings(message)
 
         if message.content[2:].find("bwoah") != -1:
             Debug.Log(f"user: {message.author}", "Started bwoah")
@@ -115,7 +123,7 @@ async def next_week(message):
         while i < len(calendar):
             if len(calendar[i].contents) == 0:
                 n_race = [r.get_text() for r in calendar[i + 1:i + 4]]
-                race_info = f"Race:    {n_race[0]}\nCircuit: {n_race[1]}\nDate:    {n_race[2]}"
+                race_info = tabulate([["Circuit", f"{n_race[1]}"], ["Date",f"{n_race[2]}"]], headers=["Race",f"{n_race[0]}"], tablefmt='plain')
                 break
             else:
                 i += 4
@@ -141,12 +149,61 @@ async def last_top10(message):
         index = 0
 
         while index < len(drivers):
+
             r_text += f"{str_extra0(index+1)}| {str(drivers[index])} - {str(teams[index])} \n"
             index += 1
 
         Debug.Log("last_top10", r_text)
     else:
         Debug.Error("SYS (last_top10)", "Site is down")
+        r_text = "Error: Unable to reach https://www.autosport.com"
+
+    await send_msg(message, r_text)
+    return
+
+async def driver_standings(message):
+    r_text = "DRIVER STANDINGS:\n"
+
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1/standings')
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        _driver_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(1) tbody tr")[1:]
+
+        for tr in _driver_standings:
+            pos = tr.select("td:nth-child(1)")[0].get_text()
+            driver = tr.select("td:nth-child(2) a")[0].get_text()
+            points = tr.select("td:nth-child(3)")[0].get_text()
+
+            r_text += f"{str_extra0(pos)}| {driver} - {points}\n"
+
+        Debug.Log("driver_standings", r_text)
+    else:
+        Debug.Error("SYS (driver_standings)", "Site is down")
+        r_text = "Error: Unable to reach https://www.autosport.com"
+
+    await send_msg(message, r_text)
+    return
+
+async def constructors_standings(message):
+    r_text = "CONSTRUCTORS STANDINGS:\n"
+
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1/standings')
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        _constructors_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(2) tbody tr")[1:]
+
+        for tr in _constructors_standings:
+            pos = tr.select("td:nth-child(1)")[0].get_text()
+            team = tr.select("td:nth-child(2)")[0].get_text()
+            points = tr.select("td:nth-child(3)")[0].get_text()
+
+            r_text += f"{str_extra0(pos)}| {team} - {points}\n"
+
+        Debug.Log("constructors_standings", r_text)
+    else:
+        Debug.Error("SYS (constructors_standings)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
     await send_msg(message, r_text)
@@ -176,7 +233,7 @@ def file_len(fname):
     return i + 1
 
 def str_extra0(num):
-    _r = ""
+    _r = num
 
     if int(num) < 10:
         _r = "0" + str(num)
@@ -208,6 +265,9 @@ Debug.Warning("SYS", f"Site up: {isSiteUp()}")
 HELP_LIST = str("Upcoming race weekend: --upcoming \n"+
                 "The race weekend after the upcoming one: --next_week \n"+
                 "Top 10 from last race: --last_top10 \n"+
+                "Current Driver Standings: --driver_standings \n"+
+                "Current Constructors Standings: --constructors_standings \n"+
+                #"Championship Calendar: --calendar \n"+
                 "Random Kimi: --bwoah")
 
 client.run(USER_CFG.get("token"))
