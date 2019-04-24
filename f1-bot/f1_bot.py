@@ -12,7 +12,7 @@ client = commands.Bot(command_prefix = '--')
 TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
 
 @client.event
-async def on_ready():    
+async def on_ready():
     Debug.Clear()
     Debug.Warning("SYS", "Bot is ready")
     Debug.Warning("SYS", "Logging started...")
@@ -21,7 +21,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    
+
     if message.content[:2] == "--":
         if message.content[2:].find("upcoming") != -1:
             Debug.Log(f"user: {message.author}", "Started upcoming")
@@ -43,13 +43,17 @@ async def on_message(message):
             Debug.Log(f"user: {message.author}", "Started constructors_standings")
             await constructors_standings(message)
 
+        if message.content[2:].find("calendar") != -1:
+            Debug.Log(f"user: {message.author}", "Started calendar")
+            await calendar(message)
+
         if message.content[2:].find("bwoah") != -1:
             Debug.Log(f"user: {message.author}", "Started bwoah")
             await bwoah(message)
 
         if message.content[2:].find("help") != -1:
             Debug.Print(f">> user: {message.author} > Help was called")
-            await message.channel.send(HELP_LIST)
+            await message.channel.send("Help: ```" + tabulate(HELP_LIST, headers="firstrow", stralign="left", tablefmt='plain') + "```")
     return
 
 async def upcoming(message):
@@ -69,7 +73,7 @@ async def upcoming(message):
 
         schedule_start = [d.find("td", class_="text-right").get("data-start") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
         schedule_end = [d.find("td", class_="text-right").get("data-end") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
-        
+
         #todo: refactor with dictionary
 
         free_practices_start = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_start[:3]]
@@ -89,7 +93,7 @@ async def upcoming(message):
         race_info += f"Circuit: {circuit}\n"
         race_info += f"Track information: {track}\n"
         race_info += "\nSCHEDULE:\n"
-        
+
         for i in range(3):
             race_info += f"FP{i+1}: {free_practices_start[i].strftime(show_format_1)} - {free_practices_end[i].strftime(show_format_2)}\n"
 
@@ -101,18 +105,18 @@ async def upcoming(message):
         race_info += "\n"
 
         race_info += f"Race: {race_start.strftime(show_format_1)} - {race_end.strftime(show_format_2)}\n"
-        
+
         Debug.Log("upcoming", race_info)
     else:
         Debug.Error("SYS (upcoming)", "Site is down")
         race_info = "Error: Unable to reach https://www.autosport.com"
-    
+
     await send_msg(message, race_info)
     return
 
 async def next_week(message):
     race_info = ""
-    
+
     if isSiteUp():
         page = requests.get('https://www.autosport.com/f1/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -146,23 +150,23 @@ async def last_top10(message):
         drivers = [d.get_text() for d in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(2) a")]
         teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
 
+        table = []
         index = 0
-
         while index < len(drivers):
-
-            r_text += f"{str_extra0(index+1)}| {str(drivers[index])} - {str(teams[index])} \n"
+            table.append([f"{index+1}", f"{drivers[index]}", f"{teams[index]}"])
             index += 1
 
+        r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
         Debug.Log("last_top10", r_text)
     else:
         Debug.Error("SYS (last_top10)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, r_text)
+    await send_msg(message, "Last week's top 10: ```" + r_text + "```")
     return
 
 async def driver_standings(message):
-    r_text = "DRIVER STANDINGS:\n"
+    r_text = ""
 
     if isSiteUp():
         page = requests.get('https://www.autosport.com/f1/standings')
@@ -170,23 +174,26 @@ async def driver_standings(message):
 
         _driver_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(1) tbody tr")[1:]
 
+        table = []
+
         for tr in _driver_standings:
             pos = tr.select("td:nth-child(1)")[0].get_text()
             driver = tr.select("td:nth-child(2) a")[0].get_text()
             points = tr.select("td:nth-child(3)")[0].get_text()
 
-            r_text += f"{str_extra0(pos)}| {driver} - {points}\n"
+            table.append([f"{pos}", f"{driver}", f"{points}"])
 
+        r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
         Debug.Log("driver_standings", r_text)
     else:
         Debug.Error("SYS (driver_standings)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, r_text)
+    await send_msg(message, "Driver Standings: ```"+r_text+"```")
     return
 
 async def constructors_standings(message):
-    r_text = "CONSTRUCTORS STANDINGS:\n"
+    r_text = ""
 
     if isSiteUp():
         page = requests.get('https://www.autosport.com/f1/standings')
@@ -194,19 +201,50 @@ async def constructors_standings(message):
 
         _constructors_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(2) tbody tr")[1:]
 
+        table = []
+
         for tr in _constructors_standings:
             pos = tr.select("td:nth-child(1)")[0].get_text()
             team = tr.select("td:nth-child(2)")[0].get_text()
             points = tr.select("td:nth-child(3)")[0].get_text()
 
-            r_text += f"{str_extra0(pos)}| {team} - {points}\n"
+            table.append([f"{pos}", f"{team}", f"{points}"])
 
+        r_text += tabulate(table, headers=["Pos", "Constructor", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
         Debug.Log("constructors_standings", r_text)
     else:
         Debug.Error("SYS (constructors_standings)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, r_text)
+    await send_msg(message, "Constructors Standings:\n ```"+r_text+"```")
+    return
+
+async def calendar(message):
+    race_info = ""
+
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1/calendar')
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
+
+        table = []
+
+        for i in range(len(calendar)):
+            if (i + 1) % 4  == 0:
+                n_race = [r.get_text() for r in calendar[i - 3:i]]
+                if len(calendar[i].contents) == 0:
+                    table.append([f"{n_race[0]}", f"{n_race[1]}", f"{n_race[2]}", " "])
+                else:
+                    table.append([f"{n_race[0]}", f"{n_race[1]}", f"{n_race[2]}", "■"])
+
+        race_info += tabulate(table, headers=["Race", "Circuit", "Date", " "], tablefmt='orgtbl', stralign="center")
+        Debug.Log("calendar", race_info)
+    else:
+        Debug.Error("SYS (calendar)", "Site is down")
+        race_info = "Error: Unable to reach https://www.autosport.com"
+
+    await send_msg(message, "Calendar: ```"+race_info+"```")
     return
 
 async def bwoah(message):
@@ -232,20 +270,6 @@ def file_len(fname):
             pass
     return i + 1
 
-def str_extra0(num):
-    _r = num
-
-    if int(num) < 10:
-        _r = "0" + str(num)
-    
-    if num == 10:
-        _r = str(num)
-
-    if num == 1 or num == 10:
-        _r += " "
-
-    return _r
-
 def localTime(time):
     return time.astimezone(timezone(USER_CFG.get('timezone')))
 
@@ -262,12 +286,12 @@ Debug.Warning("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
 Debug.Warning("SYS", f"Time zone: {USER_CFG.get('timezone')}")
 Debug.Warning("SYS", f"Site up: {isSiteUp()}")
 
-HELP_LIST = str("Upcoming race weekend: --upcoming \n"+
-                "The race weekend after the upcoming one: --next_week \n"+
-                "Top 10 from last race: --last_top10 \n"+
-                "Current Driver Standings: --driver_standings \n"+
-                "Current Constructors Standings: --constructors_standings \n"+
-                #"Championship Calendar: --calendar \n"+
-                "Random Kimi: --bwoah")
+HELP_LIST = [["Upcoming race weekend:", "--upcoming"],
+                ["The race weekend after the upcoming one:", "--next_week"],
+                ["Top 10 from last race:", "--last_top10"],
+                ["Current Driver Standings:", "--driver_standings"],
+                ["Current Constructors Standings:", "--constructors_standings"],
+                ["Championship Calendar:", "--calendar"],
+                ["Random Kimi:", "--bwoah"]]
 
 client.run(USER_CFG.get("token"))
