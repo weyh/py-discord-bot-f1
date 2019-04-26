@@ -8,7 +8,7 @@ Gives information on upcoming or previous f1 events.
 
 - Download files (debug.py, f1_bot.py, kimi.txt)
 
-- To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py file located . Currently the file must contain 2 paramaters: token, timezone.
+- To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py file located. Currently the file must contain 2 paramaters: token, timezone.
 
 Timezone eg.: CET, UTC, GMT
 
@@ -29,7 +29,24 @@ timezone:CET
 
 #### Recommendation
 
-To have the robot running day and night, use something like a raspberry pi.
+To have the bot running day and night, use something like a raspberry pi.
+
+## Commands
+
+- To access the command list you can always use "--help" in the discord chat.
+
+Command List:
+```
+Upcoming race weekend: --upcoming --coming_up
+The race weekend after the upcoming one: --next_week
+Top 10 from last race: --last_top10
+Current Driver Standings: --driver_standings --ds
+Current Constructors Standings: --constructors_standings --constructors --cs
+Championship Calendar: --calendar
+News: --news --short_news
+Long News (6 articles): --long_news
+Random Kimi: --bwoah --mwoah
+```
 
 ## Built With
 
