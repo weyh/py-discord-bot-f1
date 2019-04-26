@@ -387,7 +387,7 @@ def isSiteUp():
 
 Debug.Warning("SYS", "Reading files...")
 
-USER_CFG = {k:v[:-1] for k, v in (l.split(':') for l in open("usr.cfg"))} # there is a \n somehow
+USER_CFG = {k:v.replace("\n", "").replace(" ", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
 
 Debug.Warning("SYS", "Loading...")
 
