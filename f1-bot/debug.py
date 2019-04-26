@@ -20,20 +20,20 @@ class Debug(object):
 
 	@staticmethod
 	def Log(src, msg):
-		print(Fore.LIGHTWHITE_EX + "> " + src + ": " + msg)
+		print(Fore.LIGHTWHITE_EX + "> " + src + ": " + str(msg))
 		return
 
 	@staticmethod
 	def Warning(src, msg):
-		print(Fore.LIGHTYELLOW_EX + "> " + src + ": " + msg)
+		print(Fore.LIGHTYELLOW_EX + "> " + src + ": " + str(msg))
 		return
 
 	@staticmethod
 	def Error(src, msg):
-		print(Fore.LIGHTRED_EX + "> " + src + ": " + msg)
+		print(Fore.LIGHTRED_EX + "> " + src + ": " + str(msg))
 		return
 
 	@staticmethod
 	def Print(msg, color = Fore.WHITE):
-		print(color + msg)
+		print(color + str(msg))
 		return

@@ -1,15 +1,28 @@
-import os, requests, discord
+import os, requests, time, discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pytz import timezone
 from random import randrange
 from tabulate import tabulate
+from stopwatch import Stopwatch
 
 from debug import Debug
 
 client = commands.Bot(command_prefix = '--')
+client.remove_command("help")
+
 TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
+
+HELP_LIST = [["Upcoming race weekend:", "--upcoming\n--coming_up"],
+                ["The race weekend after the upcoming one:", "--next_week"],
+                ["Top 10 from last race:", "--last_top10"],
+                ["Current Driver Standings:", "--driver_standings \n--ds"],
+                ["Current Constructors Standings:", "--constructors_standings\n--constructors \n--cs"],
+                ["Championship Calendar:", "--calendar"],
+                ["News:", "--news\n--short_news"],
+                ["Long News (6 articles):", "--long_news"],
+                ["Random Kimi:", "--bwoah\n--mwoah"]]
 
 @client.event
 async def on_ready():
@@ -19,44 +32,11 @@ async def on_ready():
     Debug.Print("----------------")
     return
 
-@client.event
-async def on_message(message):
+@client.command(aliases=["coming_up"])
+async def upcoming(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started upcoming")
 
-    if message.content[:2] == "--":
-        if message.content[2:].find("upcoming") != -1:
-            Debug.Log(f"user: {message.author}", "Started upcoming")
-            await upcoming(message)
-
-        if message.content[2:].find("next_week") != -1:
-            Debug.Log(f"user: {message.author}", "Started next_week")
-            await next_week(message)
-
-        if message.content[2:].find("last_top10") != -1:
-            Debug.Log(f"user: {message.author}", "Started last_top10")
-            await last_top10(message)
-
-        if message.content[2:].find("driver_standings") != -1:
-            Debug.Log(f"user: {message.author}", "Started driver_standings")
-            await driver_standings(message)
-
-        if message.content[2:].find("constructors_standings") != -1:
-            Debug.Log(f"user: {message.author}", "Started constructors_standings")
-            await constructors_standings(message)
-
-        if message.content[2:].find("calendar") != -1:
-            Debug.Log(f"user: {message.author}", "Started calendar")
-            await calendar(message)
-
-        if message.content[2:].find("bwoah") != -1:
-            Debug.Log(f"user: {message.author}", "Started bwoah")
-            await bwoah(message)
-
-        if message.content[2:].find("help") != -1:
-            Debug.Print(f">> user: {message.author} > Help was called")
-            await message.channel.send("Help: ```" + tabulate(HELP_LIST, headers="firstrow", stralign="left", tablefmt='plain') + "```")
-    return
-
-async def upcoming(message):
+    sw = Stopwatch()
     race_info = ""
 
     if isSiteUp():
@@ -111,10 +91,17 @@ async def upcoming(message):
         Debug.Error("SYS (upcoming)", "Site is down")
         race_info = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, race_info)
+    await send_msg(ctx, race_info)
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
-async def next_week(message):
+@client.command()
+async def next_week(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started next_week")
+
+    sw = Stopwatch()
     race_info = ""
 
     if isSiteUp():
@@ -137,10 +124,17 @@ async def next_week(message):
         Debug.Error("SYS (next_week)", "Site is down")
         race_info = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, race_info)
+    await send_msg(ctx, race_info)
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
-async def last_top10(message):
+@client.command()
+async def last_top10(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started last_top10")
+
+    sw = Stopwatch()
     r_text = ""
 
     if isSiteUp():
@@ -162,10 +156,17 @@ async def last_top10(message):
         Debug.Error("SYS (last_top10)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, "Last week's top 10: ```" + r_text + "```")
+    await send_msg(ctx, "Last week's top 10: ```" + r_text + "```")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
-async def driver_standings(message):
+@client.command(aliases=["ds"])
+async def driver_standings(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started driver_standings")
+
+    sw = Stopwatch()
     r_text = ""
 
     if isSiteUp():
@@ -189,10 +190,17 @@ async def driver_standings(message):
         Debug.Error("SYS (driver_standings)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, "Driver Standings: ```"+r_text+"```")
+    await send_msg(ctx, "Driver Standings: ```"+r_text+"```")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
-async def constructors_standings(message):
+@client.command(aliases=["constructors", "cs"])
+async def constructors_standings(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started constructors_standings")
+
+    sw = Stopwatch()
     r_text = ""
 
     if isSiteUp():
@@ -216,10 +224,17 @@ async def constructors_standings(message):
         Debug.Error("SYS (constructors_standings)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, "Constructors Standings:\n ```"+r_text+"```")
+    await send_msg(ctx, "Constructors Standings:\n ```"+r_text+"```")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
-async def calendar(message):
+@client.command()
+async def calendar(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started calendar")
+
+    sw = Stopwatch()
     race_info = ""
 
     if isSiteUp():
@@ -244,24 +259,118 @@ async def calendar(message):
         Debug.Error("SYS (calendar)", "Site is down")
         race_info = "Error: Unable to reach https://www.autosport.com"
 
-    await send_msg(message, "Calendar: ```"+race_info+"```")
+    await send_msg(ctx, "Calendar: ```"+race_info+"```")
     return
 
-async def bwoah(message):
+@client.command(aliases=["short_news"])
+async def news(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started news")
+
+    sw = Stopwatch()
+    news = []
+
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        news_soup = list(soup.find('div', class_='columnsContainer').find('div', 'leftColumn').find("div", class_="row small-up-2 medium-up-3").select("div div .newsitem"))[:3]
+
+        for n_soup in news_soup:
+            article_url = n_soup.find("a").get("href")
+            article_img = "http://"+n_soup.find("a").find("img").get("data-src")[2:]
+            article_title = article_url.split('/')[4].replace('-', ' ').capitalize()
+            article_description = n_soup.find("span", class_="sell").get_text() 
+
+            embed = discord.Embed(title=article_title, colour=discord.Colour(0xff2800), url=str("https://www.autosport.com"+article_url), description=article_description)
+            embed.set_thumbnail(url=article_img)
+
+            news.append(embed)
+
+        Debug.Log("news", news)
+    else:
+        Debug.Error("SYS (news)", "Site is down")
+        news = "Error: Unable to reach https://www.autosport.com"
+
+    await send_msg(ctx, "News:")
+    await send_embed_msg(ctx, news)
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
+@client.command()
+async def long_news(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started long_news")
+
+    sw = Stopwatch()
+    news = []
+
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f1')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        news_soup = list(soup.find('div', class_='columnsContainer').find('div', 'leftColumn').find("div", class_="row small-up-2 medium-up-3").select("div div .newsitem"))
+
+        for n_soup in news_soup:
+            article_url = n_soup.find("a").get("href")
+            article_img = "http://"+n_soup.find("a").find("img").get("data-src")[2:]
+            article_title = article_url.split('/')[4].replace('-', ' ').capitalize()
+            article_description = n_soup.find("span", class_="sell").get_text() 
+
+            embed = discord.Embed(title=article_title, colour=discord.Colour(0xff2800), url=str("https://www.autosport.com"+article_url), description=article_description)
+            embed.set_thumbnail(url=article_img)
+
+            news.append(embed)
+
+        Debug.Log("news", news)
+    else:
+        Debug.Error("SYS (news)", "Site is down")
+        news = "Error: Unable to reach https://www.autosport.com"
+
+    await send_msg(ctx, "News:")
+    await send_embed_msg(ctx, news)
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
+@client.command(aliases=["mwoah"])
+async def bwoah(ctx):
+    Debug.Log(f"user: {ctx.author}", "Started bwoah")
+
+    sw = Stopwatch()
     rnd = randrange(file_len("kimi.txt"))
 
     with open("kimi.txt") as fp:
         for i, l in enumerate(fp):
             if rnd == i:
                 Debug.Log("bwoah", "random kimi: " + l)
-                await send_msg(message, l)
+                await send_msg(ctx, l)
                 break
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
-async def send_msg(message, msg):
-    if msg == "":
-        msg = "Err"
-    await message.channel.send(msg)
+@client.command()
+async def help(ctx):
+    Debug.Print(f">> user: {ctx.author} > Help was called")
+
+    sw = Stopwatch()
+    await ctx.channel.send("Help: ```" + tabulate(HELP_LIST, headers=[" ", " "], stralign="left", tablefmt='plain') + "```")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
+async def send_embed_msg(ctx, msg):
+    if isinstance(msg, list):
+        for m in msg:
+            await ctx.channel.send(embed=m)
+    else:
+        await ctx.channel.send(embed=msg)
+    return
+
+async def send_msg(ctx, msg):
+    await ctx.channel.send(msg)
     return
 
 def file_len(fname):
@@ -285,13 +394,5 @@ Debug.Warning("SYS", "Loading...")
 Debug.Warning("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
 Debug.Warning("SYS", f"Time zone: {USER_CFG.get('timezone')}")
 Debug.Warning("SYS", f"Site up: {isSiteUp()}")
-
-HELP_LIST = [["Upcoming race weekend:", "--upcoming"],
-                ["The race weekend after the upcoming one:", "--next_week"],
-                ["Top 10 from last race:", "--last_top10"],
-                ["Current Driver Standings:", "--driver_standings"],
-                ["Current Constructors Standings:", "--constructors_standings"],
-                ["Championship Calendar:", "--calendar"],
-                ["Random Kimi:", "--bwoah"]]
 
 client.run(USER_CFG.get("token"))
