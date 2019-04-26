@@ -37,15 +37,21 @@ To have the bot running day and night, use something like a raspberry pi.
 
 Command List:
 ```
-Upcoming race weekend: --upcoming --coming_up
-The race weekend after the upcoming one: --next_week
-Top 10 from last race: --last_top10
-Current Driver Standings: --driver_standings --ds
-Current Constructors Standings: --constructors_standings --constructors --cs
-Championship Calendar: --calendar
-News: --news --short_news
-Long News (6 articles): --long_news
-Random Kimi: --bwoah --mwoah
+Upcoming race weekend:                    --upcoming
+                                          --coming_up
+The race weekend after the upcoming one:  --next_week
+Top 10 from last race:                    --last_top10
+Current Driver Standings:                 --driver_standings
+                                          --ds
+Current Constructors Standings:           --constructors_standings
+                                          --constructors
+                                          --cs
+Championship Calendar:                    --calendar
+News:                                     --news
+                                          --short_news
+Long News (6 articles):                   --long_news
+Random Kimi:                              --bwoah
+                                          --mwoah
 ```
 
 ## Built With
