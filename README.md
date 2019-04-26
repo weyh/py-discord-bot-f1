@@ -1,7 +1,7 @@
-﻿# Discord F1 Bot
+﻿# Discord Formula 1 Bot
 
-Gives information on upcoming or previous f1 events. 
-Data is pulled from [www.autosport.com/f1](https://www.autosport.com/f1).
+Gives information on upcoming or previous F1 events. 
+Data is pulled from [autosport.com](https://www.autosport.com/f1).
 
 ## Set up
 
