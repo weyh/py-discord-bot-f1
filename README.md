@@ -1,6 +1,6 @@
 ﻿# Discord Formula 1 Bot
 
-Provides information about the upcoming or previous F1 event.
+Gives information on upcoming or previous F1 events. 
 Data is pulled from [autosport.com](https://www.autosport.com/f1).
 
 ## Set up
@@ -9,13 +9,14 @@ Data is pulled from [autosport.com](https://www.autosport.com/f1).
 
 - Download files (debug.py, f1_bot.py, kimi.txt)
 
-- To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py file located. Currently the file must contain 2 paramaters: token, timezone.
+- To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py file located. Currently the file must contain 2 paramaters: token, timezone and prefix.
 
 Timezone eg.: CET, UTC, GMT
 
 ```
 token:{token}
 timezone:{timezone}
+prefix:{prefix}
 ```
 
 Note: In the file do not include {}
@@ -24,6 +25,7 @@ Your file should look like this:
 ```
 token:a.really.long.string
 timezone:CET
+prefix:--
 ```
 
 - You are now done with the setup, you can run the file.
@@ -53,6 +55,8 @@ News:                                     --news
 Long News (6 articles):                   --long_news
 Random Kimi:                              --bwoah
                                           --mwoah
+Version:								  --version
+Help:									  --help
 ```
 
 ## Built With

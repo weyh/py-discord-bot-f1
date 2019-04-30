@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os, platform
 from colorama import init, Fore, Back, Style
 
@@ -35,5 +37,9 @@ class Debug(object):
 
 	@staticmethod
 	def Print(msg, color = Fore.WHITE):
-		print(color + str(msg))
+		if isinstance(msg, list):
+			for m in msg:
+				print(color + str(m))
+		else:
+			print(color + str(msg))
 		return

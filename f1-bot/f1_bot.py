@@ -9,11 +9,11 @@ from stopwatch import Stopwatch
 
 from debug import Debug
 
-client = commands.Bot(command_prefix = '--')
-client.remove_command("help")
+Debug.Warning("SYS", "Loading...")
 
+USER_CFG = {k:v.replace("\n", "").replace(" ", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
 TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
-
+VERSION = "v1.0.2"
 HELP_LIST = [["Upcoming race weekend:", "--upcoming\n--coming_up"],
                 ["The race weekend after the upcoming one:", "--next_week"],
                 ["Top 10 from last race:", "--last_top10"],
@@ -22,7 +22,12 @@ HELP_LIST = [["Upcoming race weekend:", "--upcoming\n--coming_up"],
                 ["Championship Calendar:", "--calendar"],
                 ["News:", "--news\n--short_news"],
                 ["Long News (6 articles):", "--long_news"],
-                ["Random Kimi:", "--bwoah\n--mwoah"]]
+                ["Random Kimi:", "--bwoah\n--mwoah"],
+                ["Version:", "--version"],
+                ["Help:", "--help"]]
+
+client = commands.Bot(command_prefix = USER_CFG.get('prefix'))
+client.remove_command("help")
 
 @client.event
 async def on_ready():
@@ -53,8 +58,6 @@ async def upcoming(ctx):
 
         schedule_start = [d.find("td", class_="text-right").get("data-start") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
         schedule_end = [d.find("td", class_="text-right").get("data-end") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
-
-        #todo: refactor with dictionary
 
         free_practices_start = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_start[:3]]
         free_practices_end = [localTime(datetime.strptime(d, TIME_FORMAT)) for d in schedule_end[:3]]
@@ -361,6 +364,17 @@ async def help(ctx):
     sw.reset()
     return
 
+@client.command()
+async def version(ctx):
+    Debug.Print(f">> user: {ctx.author} > Version was called")
+
+    sw = Stopwatch()
+    await send_msg(ctx, f"```css \nVersion: {VERSION}```")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
 async def send_embed_msg(ctx, msg):
     if isinstance(msg, list):
         for m in msg:
@@ -385,14 +399,10 @@ def localTime(time):
 def isSiteUp():
     return requests.head('https://www.autosport.com/f1').status_code == 200
 
-Debug.Warning("SYS", "Reading files...")
-
-USER_CFG = {k:v.replace("\n", "").replace(" ", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
-
-Debug.Warning("SYS", "Loading...")
-
+Debug.Warning("SYS", f"Version: {VERSION}")
 Debug.Warning("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
 Debug.Warning("SYS", f"Time zone: {USER_CFG.get('timezone')}")
 Debug.Warning("SYS", f"Site up: {isSiteUp()}")
+Debug.Warning("SYS", f"Prefix: {USER_CFG.get('prefix')}")
 
 client.run(USER_CFG.get("token"))
