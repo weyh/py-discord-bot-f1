@@ -369,7 +369,7 @@ async def version(ctx):
     Debug.Print(f">> user: {ctx.author} > Version was called")
 
     sw = Stopwatch()
-    await send_msg(ctx, f"```css \nVersion: {VERSION}```")
+    await send_msg(ctx, f"```yaml\nVersion: {VERSION}\n```")
 
     Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
