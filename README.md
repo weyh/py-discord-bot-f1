@@ -55,8 +55,8 @@ News:                                     --news
 Long News (6 articles):                   --long_news
 Random Kimi:                              --bwoah
                                           --mwoah
-Version:								  --version
-Help:									  --help
+Version:                                  --version
+Help:                                     --help
 ```
 
 ## Built With
