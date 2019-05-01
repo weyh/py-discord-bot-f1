@@ -42,8 +42,9 @@ I recommend running it on something that is always online like a raspberry pi.
 - To access the command list you can always use "--help" in the discord chat.
 
 Command List:
+
 | Description | Command |
-|:---:|:---|
+| :---: | :--- |
 | Upcoming race weekend | `--upcoming`, `--coming_up` |
 | The race weekend after the upcoming one | `--next_week` |
 | Top 10 from last race | `--last_top10` |
