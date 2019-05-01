@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-import os, platform
+import sys, os, platform
 from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
@@ -18,6 +17,11 @@ class Debug(object):
 	def Pause():
 		print(Style.RESET_ALL)
 		input("Press <Enter> key to continue...")
+		return
+
+	@staticmethod
+	def Exit():
+		sys.exit()
 		return
 
 	@staticmethod

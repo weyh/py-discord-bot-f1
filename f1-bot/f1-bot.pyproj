@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dictionary_test.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="f1_bot.py" />
     <Compile Include="debug.py" />
   </ItemGroup>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os, requests, time, discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
@@ -8,12 +9,13 @@ from tabulate import tabulate
 from stopwatch import Stopwatch
 
 from debug import Debug
+from dictionary_test import *
 
 Debug.Warning("SYS", "Loading...")
 
 USER_CFG = {k:v.replace("\n", "").replace(" ", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
 TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
-VERSION = "v1.0.2"
+VERSION = "v1.1.0"
 HELP_LIST = [["Upcoming race weekend:", "--upcoming\n--coming_up"],
                 ["The race weekend after the upcoming one:", "--next_week"],
                 ["Top 10 from last race:", "--last_top10"],
@@ -26,14 +28,16 @@ HELP_LIST = [["Upcoming race weekend:", "--upcoming\n--coming_up"],
                 ["Version:", "--version"],
                 ["Help:", "--help"]]
 
+dictionary_test(USER_CFG)
+
 client = commands.Bot(command_prefix = USER_CFG.get('prefix'))
 client.remove_command("help")
 
 @client.event
 async def on_ready():
     Debug.Clear()
-    Debug.Warning("SYS", "Bot is ready")
-    Debug.Warning("SYS", "Logging started...")
+    Debug.Log("SYS", "Bot is ready")
+    Debug.Log("SYS", "Logging started...")
     Debug.Print("----------------")
     return
 
@@ -399,10 +403,10 @@ def localTime(time):
 def isSiteUp():
     return requests.head('https://www.autosport.com/f1').status_code == 200
 
-Debug.Warning("SYS", f"Version: {VERSION}")
-Debug.Warning("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
-Debug.Warning("SYS", f"Time zone: {USER_CFG.get('timezone')}")
-Debug.Warning("SYS", f"Site up: {isSiteUp()}")
-Debug.Warning("SYS", f"Prefix: {USER_CFG.get('prefix')}")
+Debug.Log("SYS", f"Version: {VERSION}")
+Debug.Log("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
+Debug.Log("SYS", f"Time zone: {USER_CFG.get('timezone')}")
+Debug.Log("SYS", f"Site up: {isSiteUp()}")
+Debug.Log("SYS", f"Prefix: {USER_CFG.get('prefix')}")
 
 client.run(USER_CFG.get("token"))

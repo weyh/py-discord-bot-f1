@@ -12,14 +12,13 @@ Data is pulled from [autosport.com](https://www.autosport.com/f1) (thx :wink:).
 - Getting a token: [link](https://youtu.be/nW8c7vT6Hl4?t=289)
 
 - To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py is located. 
-Must contain: token, timezone (CET, UTC, GMT etc)
-Optional: prefix (default: "--")
+Must contain: token 
+Optional: prefix (default: "--"), timezone (CET, UTC, GMT etc)
 
 ```
 token:{token}
 timezone:{timezone}
 prefix:{prefix}
-.
 .
 .
 ```
