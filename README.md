@@ -44,7 +44,7 @@ I recommend running it on something that is always online like a raspberry pi.
 Command List:
 
 | Description | Command |
-| :---: | :--- |
+| :--- | :--- |
 | Upcoming race weekend | `--upcoming`, `--coming_up` |
 | The race weekend after the upcoming one | `--next_week` |
 | Top 10 from last race | `--last_top10` |
