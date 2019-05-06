@@ -7,13 +7,15 @@ Data is pulled from [autosport.com](https://www.autosport.com/f1) (thx :wink:).
 
 - Make sure you have the correct packages and version of python installed
 
-- Download files (debug.py, f1_bot.py, kimi.txt)
+- Download files (f1_bot.py, debug.py, cfg_dictionary.py, splash_screen.py, kimi.txt)
 
 - Getting a token: [link](https://youtu.be/nW8c7vT6Hl4?t=289)
 
 - To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py is located. 
-Must contain: token 
-Optional: prefix (default: "--"), timezone (CET, UTC, GMT etc)
+
+	- Must contain (except if you plan to use cli args): token
+
+	- Optional: prefix (default: "--"), timezone (CET, UTC, GMT etc), debug (True/False), default: True)
 
 ```
 token:{token}
@@ -28,6 +30,7 @@ Your file should look like this:
 token:a.really.long.string
 timezone:CET
 prefix:--
+debug:False
 ```
 
 - You are now done with the setup, you can run f1_bot.py.
@@ -36,9 +39,24 @@ prefix:--
 
 I recommend running it on something that is always online like a raspberry pi.
 
+## Command Line Arguments
+
+With command line arguments you can modify the settings of usr.cfg to that specific instance.
+
+| Parameter | Command |
+| :--- | :--- |
+| Version | `--version` |
+| Help | `-h`, `--help` |
+| Token | `--token` |
+| Timezone | `--timezone` |
+| Prefix | `--prefix` |
+| Debug | `--debug` |
+
+Eg.: `python f1_bot.py --prefix=-- --debug=False`
+
 ## Commands
 
-- To access the command list you can always use "--help" in the discord chat.
+To access the command list you can always use "--help" in the discord chat.
 
 Command List:
 
@@ -55,6 +73,7 @@ Command List:
 | Long News (6 articles) | `--long_news` |
 | Random Kimi | `--bwoah`, `--mwoah` |
 | Version | `--version` |
+| Uptime | `--uptime` |
 | Help | `--help` |
 
 ## Built With

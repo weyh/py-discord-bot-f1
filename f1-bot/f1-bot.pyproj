@@ -21,11 +21,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="dictionary_test.py">
+    <Compile Include="cfg_dictionary.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="f1_bot.py" />
     <Compile Include="debug.py" />
+    <Compile Include="splash_screen.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="kimi.txt" />

@@ -9,26 +9,31 @@ from tabulate import tabulate
 from stopwatch import Stopwatch
 
 from debug import Debug
-from dictionary_test import *
+import cfg_dictionary, splash_screen
 
-Debug.Warning("SYS", "Loading...")
+splash_screen.show()
 
-USER_CFG = {k:v.replace("\n", "").replace(" ", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
+VERSION = "v1.1.2"
+
+USER_CFG = cfg_dictionary.read()
+cfg_dictionary.update_from_argv(USER_CFG, VERSION)
+cfg_dictionary.test(USER_CFG)
+
+Debug.debug = USER_CFG.get("debug")
 TIME_FORMAT = "%a %b %d %Y %H:%M:%S %Z%z"
-VERSION = "v1.1.0"
-HELP_LIST = [["Upcoming race weekend:", "--upcoming\n--coming_up"],
-                ["The race weekend after the upcoming one:", "--next_week"],
-                ["Top 10 from last race:", "--last_top10"],
-                ["Current Driver Standings:", "--driver_standings \n--ds"],
-                ["Current Constructors Standings:", "--constructors_standings\n--constructors \n--cs"],
-                ["Championship Calendar:", "--calendar"],
-                ["News:", "--news\n--short_news"],
-                ["Long News (6 articles):", "--long_news"],
-                ["Random Kimi:", "--bwoah\n--mwoah"],
-                ["Version:", "--version"],
-                ["Help:", "--help"]]
-
-dictionary_test(USER_CFG)
+START_TIME = datetime.now()
+HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.get('prefix')}upcoming\n{USER_CFG.get('prefix')}coming_up"],
+                ["The race weekend after the upcoming one:", f"{USER_CFG.get('prefix')}next_week"],
+                ["Top 10 from last race:", f"{USER_CFG.get('prefix')}last_top10"],
+                ["Current Driver Standings:", f"{USER_CFG.get('prefix')}driver_standings \n{USER_CFG.get('prefix')}ds"],
+                ["Current Constructors Standings:", f"{USER_CFG.get('prefix')}constructors_standings\n{USER_CFG.get('prefix')}constructors \n{USER_CFG.get('prefix')}cs"],
+                ["Championship Calendar:", f"{USER_CFG.get('prefix')}calendar"],
+                ["News:", f"{USER_CFG.get('prefix')}news\n{USER_CFG.get('prefix')}short_news"],
+                ["Long News (6 articles):", f"{USER_CFG.get('prefix')}long_news"],
+                ["Random Kimi:", f"{USER_CFG.get('prefix')}bwoah\n{USER_CFG.get('prefix')}mwoah"],
+                ["Version:", f"{USER_CFG.get('prefix')}version"],
+                ["Uptime:", f"{USER_CFG.get('prefix')}uptime"],
+                ["Help:", f"{USER_CFG.get('prefix')}help"]]
 
 client = commands.Bot(command_prefix = USER_CFG.get('prefix'))
 client.remove_command("help")
@@ -36,14 +41,14 @@ client.remove_command("help")
 @client.event
 async def on_ready():
     Debug.Clear()
-    Debug.Log("SYS", "Bot is ready")
+    Debug.Log("SYS", "Bot is ready", True)
     Debug.Log("SYS", "Logging started...")
     Debug.Print("----------------")
     return
 
 @client.command(aliases=["coming_up"])
 async def upcoming(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started upcoming")
+    Debug.Warning(f"user: {ctx.author}", "Started upcoming")
 
     sw = Stopwatch()
     race_info = ""
@@ -83,12 +88,10 @@ async def upcoming(ctx):
 
         for i in range(3):
             race_info += f"FP{i+1}: {free_practices_start[i].strftime(show_format_1)} - {free_practices_end[i].strftime(show_format_2)}\n"
-
         race_info += "\n"
 
         for i in range(3):
             race_info += f"Q{i+1}: {qualifyings_start[i].strftime(show_format_1)} - {qualifyings_end[i].strftime(show_format_2)}\n"
-
         race_info += "\n"
 
         race_info += f"Race: {race_start.strftime(show_format_1)} - {race_end.strftime(show_format_2)}\n"
@@ -106,7 +109,7 @@ async def upcoming(ctx):
 
 @client.command()
 async def next_week(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started next_week")
+    Debug.Warning(f"user: {ctx.author}", "Started next_week")
 
     sw = Stopwatch()
     race_info = ""
@@ -139,7 +142,7 @@ async def next_week(ctx):
 
 @client.command()
 async def last_top10(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started last_top10")
+    Debug.Warning(f"user: {ctx.author}", "Started last_top10")
 
     sw = Stopwatch()
     r_text = ""
@@ -171,7 +174,7 @@ async def last_top10(ctx):
 
 @client.command(aliases=["ds"])
 async def driver_standings(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started driver_standings")
+    Debug.Warning(f"user: {ctx.author}", "Started driver_standings")
 
     sw = Stopwatch()
     r_text = ""
@@ -205,7 +208,7 @@ async def driver_standings(ctx):
 
 @client.command(aliases=["constructors", "cs"])
 async def constructors_standings(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started constructors_standings")
+    Debug.Warning(f"user: {ctx.author}", "Started constructors_standings")
 
     sw = Stopwatch()
     r_text = ""
@@ -239,7 +242,7 @@ async def constructors_standings(ctx):
 
 @client.command()
 async def calendar(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started calendar")
+    Debug.Warning(f"user: {ctx.author}", "Started calendar")
 
     sw = Stopwatch()
     race_info = ""
@@ -267,11 +270,14 @@ async def calendar(ctx):
         race_info = "Error: Unable to reach https://www.autosport.com"
 
     await send_msg(ctx, "Calendar: ```"+race_info+"```")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
     return
 
 @client.command(aliases=["short_news"])
 async def news(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started news")
+    Debug.Warning(f"user: {ctx.author}", "Started news")
 
     sw = Stopwatch()
     news = []
@@ -306,7 +312,7 @@ async def news(ctx):
 
 @client.command()
 async def long_news(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started long_news")
+    Debug.Warning(f"user: {ctx.author}", "Started long_news")
 
     sw = Stopwatch()
     news = []
@@ -341,7 +347,7 @@ async def long_news(ctx):
 
 @client.command(aliases=["mwoah"])
 async def bwoah(ctx):
-    Debug.Log(f"user: {ctx.author}", "Started bwoah")
+    Debug.Warning(f"user: {ctx.author}", "Started bwoah")
 
     sw = Stopwatch()
     rnd = randrange(file_len("kimi.txt"))
@@ -358,8 +364,24 @@ async def bwoah(ctx):
     return
 
 @client.command()
+async def uptime(ctx):
+    global START_TIME
+    Debug.Warning(f"user: {ctx.author}", "Started bwoah")
+
+    sw = Stopwatch()
+
+    timedelta = datetime.now() - START_TIME
+
+    Debug.Log("uptime", "Uptime: " + str(round(timedelta.total_seconds())) + "s")
+    await send_msg(ctx, "Uptime: " + str(round(timedelta.total_seconds())) + "s")
+
+    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
+@client.command()
 async def help(ctx):
-    Debug.Print(f">> user: {ctx.author} > Help was called")
+    Debug.Print(f">> user: {ctx.author} > Help")
 
     sw = Stopwatch()
     await ctx.channel.send("Help: ```" + tabulate(HELP_LIST, headers=[" ", " "], stralign="left", tablefmt='plain') + "```")
@@ -370,7 +392,7 @@ async def help(ctx):
 
 @client.command()
 async def version(ctx):
-    Debug.Print(f">> user: {ctx.author} > Version was called")
+    Debug.Print(f">> user: {ctx.author} > Version")
 
     sw = Stopwatch()
     await send_msg(ctx, f"```yaml\nVersion: {VERSION}\n```")
@@ -403,7 +425,7 @@ def localTime(time):
 def isSiteUp():
     return requests.head('https://www.autosport.com/f1').status_code == 200
 
-Debug.Log("SYS", f"Version: {VERSION}")
+Debug.Warning("SYS", f"Version: {VERSION}")
 Debug.Log("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
 Debug.Log("SYS", f"Time zone: {USER_CFG.get('timezone')}")
 Debug.Log("SYS", f"Site up: {isSiteUp()}")
