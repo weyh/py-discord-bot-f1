@@ -43,7 +43,7 @@ I recommend running it on something that is always online like a raspberry pi.
 
 With command line arguments you can modify the settings of usr.cfg to that specific instance.
 
-| Parameter | Command |
+| Parameter | Argument |
 | :--- | :--- |
 | Version | `--version` |
 | Help | `-h`, `--help` |
@@ -72,8 +72,9 @@ Command List:
 | News | `--news`, `--short_news` |
 | Long News (6 articles) | `--long_news` |
 | Random Kimi | `--bwoah`, `--mwoah` |
-| Version | `--version` |
+| Clear | `--clear`, `--clean`, `--cls` |
 | Uptime | `--uptime` |
+| Version | `--version` |
 | Help | `--help` |
 
 ## Built With

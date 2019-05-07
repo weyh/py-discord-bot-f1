@@ -13,7 +13,7 @@ import cfg_dictionary, splash_screen
 
 splash_screen.show()
 
-VERSION = "v1.1.2"
+VERSION = "v1.1.3"
 
 USER_CFG = cfg_dictionary.read()
 cfg_dictionary.update_from_argv(USER_CFG, VERSION)
@@ -31,8 +31,9 @@ HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.get('prefix')}upcoming\n{USE
                 ["News:", f"{USER_CFG.get('prefix')}news\n{USER_CFG.get('prefix')}short_news"],
                 ["Long News (6 articles):", f"{USER_CFG.get('prefix')}long_news"],
                 ["Random Kimi:", f"{USER_CFG.get('prefix')}bwoah\n{USER_CFG.get('prefix')}mwoah"],
-                ["Version:", f"{USER_CFG.get('prefix')}version"],
+                ["Clear:", f"{USER_CFG.get('prefix')}clear\n{USER_CFG.get('prefix')}clean\n{USER_CFG.get('prefix')}cls"],                
                 ["Uptime:", f"{USER_CFG.get('prefix')}uptime"],
+                ["Version:", f"{USER_CFG.get('prefix')}version"],
                 ["Help:", f"{USER_CFG.get('prefix')}help"]]
 
 client = commands.Bot(command_prefix = USER_CFG.get('prefix'))
@@ -103,7 +104,7 @@ async def upcoming(ctx):
 
     await send_msg(ctx, race_info)
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (upcoming)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -136,7 +137,7 @@ async def next_week(ctx):
 
     await send_msg(ctx, race_info)
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (next_week)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -168,7 +169,7 @@ async def last_top10(ctx):
 
     await send_msg(ctx, "Last week's top 10: ```" + r_text + "```")
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (last_top10)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -202,7 +203,7 @@ async def driver_standings(ctx):
 
     await send_msg(ctx, "Driver Standings: ```"+r_text+"```")
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (driver_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -236,7 +237,7 @@ async def constructors_standings(ctx):
 
     await send_msg(ctx, "Constructors Standings:\n ```"+r_text+"```")
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (constructors_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -271,7 +272,7 @@ async def calendar(ctx):
 
     await send_msg(ctx, "Calendar: ```"+race_info+"```")
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (calendar)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -306,7 +307,7 @@ async def news(ctx):
     await send_msg(ctx, "News:")
     await send_embed_msg(ctx, news)
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (news)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -341,7 +342,7 @@ async def long_news(ctx):
     await send_msg(ctx, "News:")
     await send_embed_msg(ctx, news)
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (long_news)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -359,7 +360,7 @@ async def bwoah(ctx):
                 await send_msg(ctx, l)
                 break
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (bwoah)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -375,7 +376,24 @@ async def uptime(ctx):
     Debug.Log("uptime", "Uptime: " + str(round(timedelta.total_seconds())) + "s")
     await send_msg(ctx, "Uptime: " + str(round(timedelta.total_seconds())) + "s")
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (uptime)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
+@client.command(aliases=["clean", "cls"])
+async def clear(ctx):
+    Debug.Warning(f"user: {ctx.author}", "Started clear")
+
+    sw = Stopwatch()
+    messages = await ctx.message.channel.history().flatten()
+
+    Debug.Log(f"clear", f"Msg list length {len(messages)}")
+
+    for message in messages:
+        if message.author.bot or message.content[:len(USER_CFG.get('prefix'))] == USER_CFG.get('prefix'):
+            await message.delete()
+        
+    Debug.Warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
@@ -397,7 +415,7 @@ async def version(ctx):
     sw = Stopwatch()
     await send_msg(ctx, f"```yaml\nVersion: {VERSION}\n```")
 
-    Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (version)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 
