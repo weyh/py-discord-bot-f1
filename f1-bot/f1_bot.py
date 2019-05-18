@@ -13,7 +13,7 @@ import cfg_dictionary, splash_screen
 
 splash_screen.show()
 
-VERSION = "v1.1.3"
+VERSION = "v1.1.4"
 
 USER_CFG = cfg_dictionary.read()
 cfg_dictionary.update_from_argv(USER_CFG, VERSION)
@@ -121,7 +121,6 @@ async def next_week(ctx):
         calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
 
         i = 3
-
         while i < len(calendar):
             if len(calendar[i].contents) == 0:
                 n_race = [r.get_text() for r in calendar[i + 1:i + 4]]
@@ -156,10 +155,8 @@ async def last_top10(ctx):
         teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
 
         table = []
-        index = 0
-        while index < len(drivers):
-            table.append([f"{index+1}", f"{drivers[index]}", f"{teams[index]}"])
-            index += 1
+        for i, (driver, team) in enumerate(zip(drivers, teams), start=1):
+            table.append([f"{i}", f"{driver}", f"{team}"])
 
         r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
         Debug.Log("last_top10", r_text)
@@ -187,7 +184,6 @@ async def driver_standings(ctx):
         _driver_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(1) tbody tr")[1:]
 
         table = []
-
         for tr in _driver_standings:
             pos = tr.select("td:nth-child(1)")[0].get_text()
             driver = tr.select("td:nth-child(2) a")[0].get_text()
@@ -221,7 +217,6 @@ async def constructors_standings(ctx):
         _constructors_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(2) tbody tr")[1:]
 
         table = []
-
         for tr in _constructors_standings:
             pos = tr.select("td:nth-child(1)")[0].get_text()
             team = tr.select("td:nth-child(2)")[0].get_text()
@@ -255,7 +250,6 @@ async def calendar(ctx):
         calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
 
         table = []
-
         for i in range(len(calendar)):
             if (i + 1) % 4  == 0:
                 n_race = [r.get_text() for r in calendar[i - 3:i]]
@@ -290,7 +284,7 @@ async def news(ctx):
 
         for n_soup in news_soup:
             article_url = n_soup.find("a").get("href")
-            article_img = "http://"+n_soup.find("a").find("img").get("data-src")[2:]
+            article_img = "http://" + n_soup.find("a").find("img").get("data-src")[2:]
             article_title = article_url.split('/')[4].replace('-', ' ').capitalize()
             article_description = n_soup.find("span", class_="sell").get_text() 
 
@@ -325,7 +319,7 @@ async def long_news(ctx):
 
         for n_soup in news_soup:
             article_url = n_soup.find("a").get("href")
-            article_img = "http://"+n_soup.find("a").find("img").get("data-src")[2:]
+            article_img = "http://" + n_soup.find("a").find("img").get("data-src")[2:]
             article_title = article_url.split('/')[4].replace('-', ' ').capitalize()
             article_description = n_soup.find("span", class_="sell").get_text() 
 
@@ -353,13 +347,11 @@ async def bwoah(ctx):
     sw = Stopwatch()
     rnd = randrange(file_len("kimi.txt"))
 
-    with open("kimi.txt") as fp:
-        for i, l in enumerate(fp):
-            if rnd == i:
-                Debug.Log("bwoah", "random kimi: " + l)
-                await send_msg(ctx, l)
-                break
+    msg = open("kimi.txt")[rnd].replace("\n", "").replace(" ", "").replace("\t", "")
 
+    Debug.Log("bwoah", "random kimi: " + msg)
+    await send_msg(ctx, msg)
+    
     Debug.Warning("SYS (bwoah)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
@@ -437,11 +429,9 @@ def file_len(fname):
             pass
     return i + 1
 
-def localTime(time):
-    return time.astimezone(timezone(USER_CFG.get('timezone')))
+localTime = lambda time: time.astimezone(timezone(USER_CFG.get('timezone')))
 
-def isSiteUp():
-    return requests.head('https://www.autosport.com/f1').status_code == 200
+isSiteUp = lambda: requests.head('https://www.autosport.com/f1').status_code == 200
 
 Debug.Warning("SYS", f"Version: {VERSION}")
 Debug.Log("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")

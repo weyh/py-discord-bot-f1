@@ -7,7 +7,7 @@ __not_optional_parameters = ["token"]
 __optional_parameters = {"timezone":"CET", "prefix":"--", "debug":True}
 
 def read():
-    return {k:v.replace("\n", "").replace(" ", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
+    return {k:v.replace("\n", "").replace(" ", "").replace("\t", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
 
 def update_from_argv(d, version):
     if len(sys.argv) == 1:
@@ -46,5 +46,4 @@ def test(d):
 
     return
 
-def __str2bool(v):
-    return str(v).lower() in ("yes", "true", "t", "y", "1")
+__str2bool = lambda v: str(v).lower() in ("yes", "true", "t", "y", "1")

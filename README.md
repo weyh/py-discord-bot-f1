@@ -1,5 +1,7 @@
 ﻿# Discord Formula 1 Bot
 
+![bot logo](py-discord-bot-f1.png)
+
 Gives information on upcoming or previous F1 events. 
 Data is pulled from [autosport.com](https://www.autosport.com/f1) (thx :wink:).
 
