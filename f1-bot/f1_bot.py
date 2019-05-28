@@ -4,7 +4,6 @@ from discord.ext import commands
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pytz import timezone
-from random import randrange
 from tabulate import tabulate
 from stopwatch import Stopwatch
 
@@ -13,7 +12,7 @@ import cfg_dictionary, splash_screen
 
 splash_screen.show()
 
-VERSION = "v1.1.4"
+VERSION = "v1.2.0"
 
 USER_CFG = cfg_dictionary.read()
 cfg_dictionary.update_from_argv(USER_CFG, VERSION)
@@ -30,7 +29,6 @@ HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.get('prefix')}upcoming\n{USE
                 ["Championship Calendar:", f"{USER_CFG.get('prefix')}calendar"],
                 ["News:", f"{USER_CFG.get('prefix')}news\n{USER_CFG.get('prefix')}short_news"],
                 ["Long News (6 articles):", f"{USER_CFG.get('prefix')}long_news"],
-                ["Random Kimi:", f"{USER_CFG.get('prefix')}bwoah\n{USER_CFG.get('prefix')}mwoah"],
                 ["Clear:", f"{USER_CFG.get('prefix')}clear\n{USER_CFG.get('prefix')}clean\n{USER_CFG.get('prefix')}cls"],                
                 ["Uptime:", f"{USER_CFG.get('prefix')}uptime"],
                 ["Version:", f"{USER_CFG.get('prefix')}version"],
@@ -340,22 +338,6 @@ async def long_news(ctx):
     sw.reset()
     return
 
-@client.command(aliases=["mwoah"])
-async def bwoah(ctx):
-    Debug.Warning(f"user: {ctx.author}", "Started bwoah")
-
-    sw = Stopwatch()
-    rnd = randrange(file_len("kimi.txt"))
-
-    msg = open("kimi.txt")[rnd].replace("\n", "").replace(" ", "").replace("\t", "")
-
-    Debug.Log("bwoah", "random kimi: " + msg)
-    await send_msg(ctx, msg)
-    
-    Debug.Warning("SYS (bwoah)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
-    sw.reset()
-    return
-
 @client.command()
 async def uptime(ctx):
     global START_TIME
@@ -408,6 +390,29 @@ async def version(ctx):
     await send_msg(ctx, f"```yaml\nVersion: {VERSION}\n```")
 
     Debug.Warning("SYS (version)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+    return
+
+@client.command(aliases=["f2", "formula2"], pass_context=True)
+async def _f2_modele(ctx, *, message):
+    try:
+        import f2_module
+    except ModuleNotFoundError:
+        Debug.Error(f"SYS", f"f2_module was called but its not installed!")
+        return
+
+    Debug.Warning(f"user: {ctx.author}", f"Started f2_modele({message})")
+    sw = Stopwatch()
+
+    msg_type, msg = f2_module.resolve(message, USER_CFG.get('prefix'))
+
+    if msg_type == "embed":
+        await send_msg(ctx, "News:")
+        await send_embed_msg(ctx, msg)
+    else:
+        await send_msg(ctx, msg)
+
+    Debug.Warning(f"SYS f2_modele({message})", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
     return
 

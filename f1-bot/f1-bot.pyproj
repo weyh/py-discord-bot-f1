@@ -26,12 +26,14 @@
     </Compile>
     <Compile Include="f1_bot.py" />
     <Compile Include="debug.py" />
+    <Compile Include="f2_module.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="splash_screen.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="kimi.txt" />
     <Content Include="usr.cfg" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

@@ -9,7 +9,7 @@ Data is pulled from [autosport.com](https://www.autosport.com/f1) (thx :wink:).
 
 - Make sure you have the correct packages and version of python installed
 
-- Download files (f1_bot.py, debug.py, cfg_dictionary.py, splash_screen.py, kimi.txt)
+- Download files: f1_bot.py, debug.py, cfg_dictionary.py, splash_screen.py (f2_module.py is optional)
 
 - Getting a token: [link](https://youtu.be/nW8c7vT6Hl4?t=289)
 
@@ -73,11 +73,22 @@ Command List:
 | Championship Calendar | `--calendar` |
 | News | `--news`, `--short_news` |
 | Long News (6 articles) | `--long_news` |
-| Random Kimi | `--bwoah`, `--mwoah` |
 | Clear | `--clear`, `--clean`, `--cls` |
 | Uptime | `--uptime` |
 | Version | `--version` |
 | Help | `--help` |
+
+F2 Command List:
+
+| Description | Command |
+| :--- | :--- |
+| The race weekend after the upcoming one | `--f2 next_week` |
+| Top 10 from last race | `--f2 last_top10` |
+| Current Driver Standings | `--f2 driver_standings`, `--f2 ds` |
+| Championship Calendar | `--f2 calendar` |
+| News | `--f2 news`, `--f2 short_news` |
+| Long News (6 articles) | `--f2 long_news` |
+| Help | `--f2 help` |
 
 ## Built With
 
