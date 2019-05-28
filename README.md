@@ -9,9 +9,9 @@ Data is pulled from [autosport.com](https://www.autosport.com/f1) (thx :wink:).
 
 - Make sure you have the correct packages and version of python installed
 
-- Download files: f1_bot.py, debug.py, cfg_dictionary.py, splash_screen.py (f2_module.py is optional)
+- Download files: f1_bot.py, debug.py, cfg_dictionary.py, splash_screen.py *(f2_module.py is optional)*
 
-- Getting a token: [link](https://youtu.be/nW8c7vT6Hl4?t=289)
+- How to get a token: [link](https://youtu.be/nW8c7vT6Hl4?t=289)
 
 - To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py is located. 
 
@@ -43,7 +43,7 @@ I recommend running it on something that is always online like a raspberry pi.
 
 ## Command Line Arguments
 
-With command line arguments you can modify the settings of usr.cfg to that specific instance.
+With command line arguments you can modify the settings of usr.cfg to that specific instance of the bot.
 
 | Parameter | Argument |
 | :--- | :--- |
