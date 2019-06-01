@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-import os, requests, time, discord
+import sys, os, requests, platform, time, discord
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.chrome.options import Options as ChomreOptions
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pytz import timezone
@@ -7,7 +15,10 @@ from tabulate import tabulate
 
 from debug import Debug
 
-HELP_LIST = [["The race weekend after the upcoming one:", "|prefix|f2 next_week"],
+__addPath = True
+
+HELP_LIST = [["Upcoming race weekend:", "|prefix|f2 upcoming\n|prefix|f2 coming_up"],
+                ["The race weekend after the upcoming one:", "|prefix|f2 next_week"],
                 ["Top 10 from last race:", "|prefix|f2 last_top10"],
                 ["Current Driver Standings:", "|prefix|f2 driver_standings \n|prefix|f2 ds"],
                 ["Championship Calendar:", "|prefix|f2 calendar"],
@@ -15,8 +26,10 @@ HELP_LIST = [["The race weekend after the upcoming one:", "|prefix|f2 next_week"
                 ["Long News (6 articles):", "|prefix|f2 long_news"],
                 ["Help:", "|prefix|f2 help"]]
 
-def resolve(msg, prefix):
-    if msg == "next_week":
+def resolve(msg, USER_CFG):
+    if msg == "upcoming" or msg == "coming_up":
+        return "str", upcoming(USER_CFG)
+    elif msg == "next_week":
         return "str", next_week()
     elif msg == "last_top10":
         return "str", last_top10()
@@ -29,9 +42,96 @@ def resolve(msg, prefix):
     elif msg == "short_news" or msg == "news":
         return "embed", news()
     elif msg == "help":
-        return "str", help(prefix)
+        return "str", help(USER_CFG.get('prefix'))
 
-    return "str", "Error!"
+    Debug.Error("f2_modele(resolve)", f"Incorrect command \"{msg}\"")
+    return "str", f"Incorrect command \"{msg}\""
+
+def upcoming(USER_CFG):
+    if(USER_CFG.get('browser_path') == "undefined"):
+        Debug.Error("SYS (upcoming)", "Browser is not defined!")
+        Debug.Pause()
+
+    race_info = "COMING UP:\n"
+
+    if isSiteUp("http://www.fiaformula2.com"):
+        global __addPath
+
+        binary = r"%s"%USER_CFG.get('browser_path')
+
+        if "firefox" in binary.lower():
+            options = FirefoxOptions()
+            options.set_headless(headless=True)
+            options.binary = binary
+            cap = DesiredCapabilities().FIREFOX
+            cap["marionette"] = True
+
+            if __addPath and platform.system() == "Windows":
+                sys.path.append(os.path.join(os.getcwd(), "geckodriver.exe"))
+                __addPath = False
+
+            driver = webdriver.Firefox(firefox_options=options, capabilities=cap)
+        elif "chrome" in binary.lower():
+            options = ChomreOptions()
+            options.set_headless(headless=True)
+            options.binary_location = binary
+            options.add_argument('--hide-scrollbars')
+            options.add_argument('--disable-gpu')
+            options.add_argument("--log-level=3")  
+
+            if platform.system() == "Windows":
+                driver = webdriver.Chrome(r"%s"%"chromedriver.exe", options=options)
+            else:
+                driver = webdriver.Chrome(options=options)
+        else:
+            Debug.Error("SYS (upcoming)", "Not supported browser!")
+            Debug.Pause()
+       
+
+        driver.get("http://www.fiaformula2.com")
+
+        try:
+            element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "countdown")))
+
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            _upcoming = soup.find("div", class_="module")
+
+            location = _upcoming.find('div', id="raceName").select("h4")[0].get_text().split(', ')[1]
+            circuit = _upcoming.find('div', id="raceName").select("h4")[0].get_text().split(', ')[0]
+            
+            d = _upcoming.find('div', id='countdownClock').find('span', id='day').get_text()
+            h = _upcoming.find('div', id='countdownClock').find('span', id='hour').get_text()
+            s = _upcoming.find('div', id='countdownClock').find('span', id='min').get_text()
+            m = _upcoming.find('div', id='countdownClock').find('span', id='sec').get_text()
+            race_starts_in = f"{d} {__days_or_day_help(d)}, {h}:{s}:{m}"
+
+            free_practices = _upcoming.find('div', id='session-0').find('span', class_="gmttime").get_text()
+            qualifying = _upcoming.find('div', id='session-1').find('span', class_="gmttime").get_text()
+            race_1 = _upcoming.find('div', id='session-2').find('span', class_="gmttime").get_text()
+            race_2 = _upcoming.find('div', id='session-3').find('span', class_="gmttime").get_text()
+
+            date = race_1[3:10]
+
+            race_info += str(f"{location} / {date}\n" + 
+                        f"Race starts in: {race_starts_in}\n" +
+                        f"Circuit: {circuit}\n\n" +
+                        "SCHEDULE:\n" +
+                        f"Practice: {free_practices}\n" +
+                        f"Qualifying: {qualifying}\n" +
+                        f"Race 1: {free_practices}\n" +
+                        f"Race 2: {free_practices}"
+                        )
+        
+            Debug.Log("upcoming", race_info)
+        except TimeoutException:
+              Debug.Error("SYS (upcoming)", "Loading took too much time!")
+        finally:
+            driver.quit()
+    else:
+        Debug.Error("SYS (upcoming)", "Site is down")
+        race_info = "Error: Unable to reach http://www.fiaformula2.com"
+
+    return race_info
 
 def calendar():
     race_info = ""
@@ -189,4 +289,10 @@ def help(prefix):
         e[1] = e[1].replace("|prefix|", prefix)
     return "Help: ```" + tabulate(HELP_LIST, headers=[" ", " "], stralign="left", tablefmt='plain') + "```"
 
-isSiteUp = lambda: requests.head('https://www.autosport.com/f2').status_code == 200
+def isSiteUp(url = "https://www.autosport.com/f2"):
+    return requests.head(url).status_code == 200
+
+def __days_or_day_help(s):
+    if int(s) > 1:
+        return "days"
+    return "day"

@@ -4,10 +4,10 @@ from debug import Debug
 from optparse import OptionParser
 
 __not_optional_parameters = ["token"]
-__optional_parameters = {"timezone":"CET", "prefix":"--", "debug":True}
+__optional_parameters = {"timezone":"CET", "prefix":"--", "debug":True, "browser_path":"undefined"}
 
 def read():
-    return {k:v.replace("\n", "").replace(" ", "").replace("\t", "") for k, v in (l.split(':') for l in open("usr.cfg"))}
+    return {k:v.replace("\n", "").replace("\t", "").replace('\\', '/') for k, v in (l.split('=') for l in open("usr.cfg"))}
 
 def update_from_argv(d, version):
     if len(sys.argv) == 1:

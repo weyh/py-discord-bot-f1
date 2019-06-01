@@ -1,0 +1,9 @@
+﻿-i https://pypi.org/simple
+beautifulsoup4
+bs4
+discord-py
+selenium
+pytz
+tabulate
+stopwatch.py
+colorama

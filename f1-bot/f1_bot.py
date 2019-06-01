@@ -12,7 +12,7 @@ import cfg_dictionary, splash_screen
 
 splash_screen.show()
 
-VERSION = "v1.2.0"
+VERSION = "v1.2.2"
 
 USER_CFG = cfg_dictionary.read()
 cfg_dictionary.update_from_argv(USER_CFG, VERSION)
@@ -326,9 +326,9 @@ async def long_news(ctx):
 
             news.append(embed)
 
-        Debug.Log("news", news)
+        Debug.Log("long_news", news)
     else:
-        Debug.Error("SYS (news)", "Site is down")
+        Debug.Error("SYS (long_news)", "Site is down")
         news = "Error: Unable to reach https://www.autosport.com"
 
     await send_msg(ctx, "News:")
@@ -404,7 +404,7 @@ async def _f2_modele(ctx, *, message):
     Debug.Warning(f"user: {ctx.author}", f"Started f2_modele({message})")
     sw = Stopwatch()
 
-    msg_type, msg = f2_module.resolve(message, USER_CFG.get('prefix'))
+    msg_type, msg = f2_module.resolve(message, USER_CFG)
 
     if msg_type == "embed":
         await send_msg(ctx, "News:")
@@ -438,10 +438,10 @@ localTime = lambda time: time.astimezone(timezone(USER_CFG.get('timezone')))
 
 isSiteUp = lambda: requests.head('https://www.autosport.com/f1').status_code == 200
 
-Debug.Warning("SYS", f"Version: {VERSION}")
-Debug.Log("SYS", f"Token found: {len(USER_CFG.get('token')) != 0}")
-Debug.Log("SYS", f"Time zone: {USER_CFG.get('timezone')}")
-Debug.Log("SYS", f"Site up: {isSiteUp()}")
-Debug.Log("SYS", f"Prefix: {USER_CFG.get('prefix')}")
+Debug.Warning("BOOT", f"Version: {VERSION}")
+Debug.Log("BOOT", f"Token found: {len(USER_CFG.get('token')) != 0}")
+Debug.Log("BOOT", f"Time zone: {USER_CFG.get('timezone')}")
+Debug.Log("BOOT", f"Site up: {isSiteUp()}")
+Debug.Log("BOOT", f"Prefix: {USER_CFG.get('prefix')}")
 
 client.run(USER_CFG.get("token"))

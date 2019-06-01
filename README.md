@@ -1,45 +1,55 @@
 ﻿![bot logo](logo.png)
 
-# Discord Formula 1, 2 Bot
+# Discord Formula 1, Formula 2 Bot
 
-Gives information on upcoming or previous F1 events. 
-Data is pulled from [autosport.com](https://www.autosport.com/f1) (thx :wink:).
+Gives information on upcoming or previous F1, F2 events. 
 
 ## Set up
 
-- Make sure you have the correct packages and version of python installed
+1. Installation:
+	- Make sure Python 3.6.6 or later is installed.
+	- Run the following commands:
+```bash
+git clone https://github.com/weyh/py-discord-bot-f1.git
+cd py-discord-bot-f1/f1-bot/
+pip install -r reqs.txt
+```
 
-- Download files: f1_bot.py, debug.py, cfg_dictionary.py, splash_screen.py *(f2_module.py is optional)*
+*F2 module is optional, so you can delete "f2_module.py" if you are not planning to use it.*
 
-- How to get a token: [link](https://youtu.be/nW8c7vT6Hl4?t=289)
 
-- To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py is located. 
+2. [How to get a token](https://youtu.be/nW8c7vT6Hl4?t=289)
+
+4. To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py is located. 
 
 	- Must contain (except if you plan to use cli args): token
 
 	- Optional: prefix (default: "--"), timezone (CET, UTC, GMT etc), debug (True/False), default: True)
 
-```
-token:{token}
-timezone:{timezone}
-prefix:{prefix}
-.
-.
-```
-
 Your file should look like this:
+
 ```
-token:a.really.long.string
-timezone:CET
-prefix:--
-debug:False
+token=a.really.long.string
+timezone=CET
+prefix=--
+debug=False
 ```
 
-- You are now done with the setup, you can run f1_bot.py.
+---
 
-#### Recommendation
+If you want to use **f2_module** then you must define the browser's path in user.cfg. *Supported: Google Chrome, Mozilla Firefox. (Make sure your browser is up-to-date.)*
+Eg.: `browser_path=C:\Program Files\Mozilla Firefox\firefox.exe`
+You also need to download a [third party browser driver](https://www.seleniumhq.org/download/) which matches the browser that is defined in browser_path. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz))*
 
-I recommend running it on something that is always online like a raspberry pi.
+- On **Windows**, browser driver should be located in the root directory!
+- On **Linux**, browser driver should be copied to `/usr/local/bin`!
+Run: `sudo cp geckodriver /usr/local/bin`
+
+*Unfortunately "marionette" does not seem to work on Raspbian, so each time a function (which uses selenium) runs a new instance of the browser will be launched.*
+
+---
+
+5. You are now done with the setup, you can run f1_bot.py. *(I recommend running it on a single board computer.)*
 
 ## Command Line Arguments
 
@@ -78,10 +88,11 @@ Command List:
 | Version | `--version` |
 | Help | `--help` |
 
-F2 Command List:
+F2 Module Command List:
 
 | Description | Command |
 | :--- | :--- |
+| Upcoming race weekend | `--f2 upcoming`, `--f2 coming_up` |
 | The race weekend after the upcoming one | `--f2 next_week` |
 | Top 10 from last race | `--f2 last_top10` |
 | Current Driver Standings | `--f2 driver_standings`, `--f2 ds` |
@@ -90,22 +101,27 @@ F2 Command List:
 | Long News (6 articles) | `--f2 long_news` |
 | Help | `--f2 help` |
 
-## Built With
+---
 
-- [Python (3.7.2)](https://www.python.org) (but should work with 3.5.3+)
+### Built With
+
+- [Python (3.7.2)](https://www.python.org)
 
 #### Packages
 
 * [discord.py](https://github.com/Rapptz/discord.py)
 * [bs4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+* [selenium](https://www.seleniumhq.org)
 * [pytz](https://pypi.org/project/pytz/)
 * [python-tabulate](https://github.com/gregbanks/python-tabulate)
 * [stopwatch.py](https://pypi.org/project/stopwatch.py/)
+* [colorama](https://github.com/tartley/colorama)
 
+---
 
-## Author
+### Author
 
 [Bak Gergely János](https://github.com/weyh)
 
-## License
+### License
 This project is licensed under the MIT License - see the [MIT License](LICENSE) file for details.

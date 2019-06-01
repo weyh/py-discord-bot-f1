@@ -333,3 +333,5 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 f1-bot/usr.cfg
+f1-bot/chromedriver.exe
+f1-bot/geckodriver.exe
