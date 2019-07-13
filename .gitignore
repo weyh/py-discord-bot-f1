@@ -335,3 +335,5 @@ ASALocalRun/
 f1-bot/usr.cfg
 f1-bot/chromedriver.exe
 f1-bot/geckodriver.exe
+f1-bot-v2/usr.cfg
+f1-bot-v2/geckodriver.exe

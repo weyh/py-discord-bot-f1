@@ -1,4 +1,5 @@
-﻿
+﻿# No Longer Supported!
+
 ![bot logo](logo.png)
 
 # Discord Formula 1, Formula 2 Bot
@@ -12,7 +13,7 @@ Gives information on upcoming or previous F1, F2 events.
 	- Run the following commands:
 ```bash
 git clone https://github.com/weyh/py-discord-bot-f1.git
-cd py-discord-bot-f1
+cd py-discord-bot-f1/f1-bot/
 pip install -r reqs.txt
 ```
 
@@ -21,11 +22,11 @@ pip install -r reqs.txt
 
 2. [How to get a token](https://youtu.be/nW8c7vT6Hl4?t=289)
 
-4. To configure the bot you need to create a file called "usr.cfg" in the same directory where the "f1_bot_v2.py" is located. 
+4. To configure the bot you need to create a file called "usr.cfg" in the same directory where the f1_bot.py is located. 
 
-	- Must contain: token
+	- Must contain (except if you plan to use cli args): token
 
-	- Optional: prefix (default: "--"), timezone (CET, UTC, GMT etc), debug (True/False, default: True)
+	- Optional: prefix (default: "--"), timezone (CET, UTC, GMT etc), debug (True/False), default: True)
 
 Your file should look like this:
 
@@ -40,7 +41,7 @@ debug=False
 
 If you want to use **f2_module** then you must define the browser's path in user.cfg. *Supported: Google Chrome, Mozilla Firefox. (Make sure your browser is up-to-date.)*
 Eg.: `browser_path=C:\Program Files\Mozilla Firefox\firefox.exe`
-You also need to download a [third party browser driver](https://www.seleniumhq.org/download/) which matches the browser that is defined in **browser_path**. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz))*
+You also need to download a [third party browser driver](https://www.seleniumhq.org/download/) which matches the browser that is defined in browser_path. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz))*
 
 - On **Windows**, browser driver should be located in the root directory!
 - On **Linux**, browser driver should be copied to `/usr/local/bin`!
@@ -50,9 +51,7 @@ Run: `sudo cp geckodriver /usr/local/bin`
 
 ---
 
-5. You are now done with the setup, you can run "f1_bot_v2.py". 
-
-**Note:** *f1_bot_v2.py* is located in the **"f1-bot-v2"** folder. You can delete everything else except this directory.
+5. You are now done with the setup, you can run f1_bot.py. *(I recommend running it on a single board computer.)*
 
 ## Command Line Arguments
 
@@ -67,7 +66,7 @@ With command line arguments you can modify the settings of usr.cfg to that speci
 | Prefix | `--prefix` |
 | Debug | `--debug` |
 
-Eg.: `python f1_bot_v2.py --prefix=-- --debug=False`
+Eg.: `python f1_bot.py --prefix=-- --debug=False`
 
 ## Commands
 
@@ -79,12 +78,12 @@ Command List:
 | :--- | :--- |
 | Upcoming race weekend | `--upcoming`, `--coming_up` |
 | The race weekend after the upcoming one | `--next_week` |
-| Last Race Results: | `--last_race_results`, `--last_race`, `--lrr` |
-| Last Qualifying Results | `--last_qualifying_results`, `--last_qualifying`, `--lqr` |
+| Top 10 from last race | `--last_top10` |
 | Current Driver Standings | `--driver_standings`, `--ds` |
 | Current Constructors Standings | `--constructors_standings`, `--constructors`, `--cs` |
 | Championship Calendar | `--calendar` |
-| News | `--news` |
+| News | `--news`, `--short_news` |
+| Long News (6 articles) | `--long_news` |
 | Clear | `--clear`, `--clean`, `--cls` |
 | Uptime | `--uptime` |
 | Version | `--version` |
@@ -99,7 +98,8 @@ F2 Module Command List:
 | Top 10 from last race | `--f2 last_top10` |
 | Current Driver Standings | `--f2 driver_standings`, `--f2 ds` |
 | Championship Calendar | `--f2 calendar` |
-| News | `--f2 news` |
+| News | `--f2 news`, `--f2 short_news` |
+| Long News (6 articles) | `--f2 long_news` |
 | Help | `--f2 help` |
 
 ---
@@ -119,11 +119,6 @@ F2 Module Command List:
 * [colorama](https://github.com/tartley/colorama)
 
 ---
-
-### Sources:
-
-[Ergast Developer API](http://ergast.com/mrd/)
-[autosport.com](https://www.autosport.com/f1)
 
 ### Author
 

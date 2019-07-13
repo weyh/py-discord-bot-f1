@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>a54be69b-3115-4966-8da2-0f6693416e9f</ProjectGuid>
+    <ProjectGuid>1eaf834a-5bb5-4b6e-9ef4-81cfde61e268</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>f1_bot.py</StartupFile>
+    <StartupFile>f1_bot_v2.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>f1-bot</Name>
-    <RootNamespace>f1-bot</RootNamespace>
+    <Name>f1-bot-v2</Name>
+    <RootNamespace>f1-bot-v2</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,22 +21,24 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="cfg_dictionary.py">
+    <Compile Include="Core\cfg_dictionary.py" />
+    <Compile Include="Core\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="f1_bot.py" />
-    <Compile Include="debug.py" />
-    <Compile Include="f2_module.py">
+    <Compile Include="Core\debug.py" />
+    <Compile Include="Core\EDAW.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="splash_screen.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="f1_bot_v2.py" />
+    <Compile Include="Core\splash_screen.py" />
+    <Compile Include="f2_module.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="chromedriver.exe" />
     <Content Include="geckodriver.exe" />
     <Content Include="usr.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Core\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
