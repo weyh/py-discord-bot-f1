@@ -13,7 +13,7 @@ from Core import *
 splash_screen.show()
 
 START_TIME = datetime.now()
-VERSION = "v2.0.0"
+VERSION = "v2.0.1"
 USER_CFG = cfg_dictionary.read()
 
 cfg_dictionary.update_from_argv(USER_CFG, VERSION)
@@ -136,8 +136,8 @@ async def last_race_results(ctx):
 
     lrr = EDAW.Get().LastRaceResults()
 
-    Debug.Log("last_race_results", lrr)
-    await send_msg(ctx, "Last Race Results:\n```" + lrr + "```")
+    Debug.Log("last_race_results", lrr[1])
+    await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```" + lrr[1] + "```")
 
     Debug.Warning("SYS (last_race_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -151,8 +151,8 @@ async def last_qualifying_results(ctx):
 
     lqr = EDAW.Get().LastQualifyingResults()
 
-    Debug.Log("last_qualifying_results", lqr)
-    await send_msg(ctx, "Last Qualifying Results:\n```" + lqr + "```")
+    Debug.Log("last_qualifying_results", lqr[1])
+    await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```" + lqr[1] + "```")
 
     Debug.Warning("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()

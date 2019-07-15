@@ -20,6 +20,8 @@ class Get:
         return time.astimezone(timezone(self.timezone))
 
     def Upcoming(self):
+        """ Returns a string created by 'tabulate' """
+
         show_format_0 = "%a %d %b"
         show_format_1 = "%H:%M"
         current_date = datetime.now()
@@ -47,9 +49,12 @@ class Get:
         races_json = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
         race = {}
-        for _race in races_json:
+        for i, _race in enumerate(races_json):
             if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < datetime.now():
-                race = _race
+                if _race['Circuit']['Location']['country'] == "UAE":
+                    return "End of session"
+                else:
+                    race = races_json[i+1]
 
         country = race['Circuit']['Location']['country']
         date = datetime.strptime(race['date'], self.time_formats['date']).strftime(self.time_formats['show'])
@@ -79,6 +84,8 @@ class Get:
         return race_info
 
     def NextWeek(self):
+        """ Returns a string created by 'tabulate' """
+
         json_file = requests.get(f"{self.__url}/current.json").json()
         races_json = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
@@ -88,7 +95,7 @@ class Get:
                 if _race['Circuit']['Location']['country'] == "UAE":
                     return "End of session"
                 else:
-                    race = races_json[i + 1]
+                    race = races_json[i + 2]
 
         country = race['Circuit']['Location']['country']
         date = datetime.strptime(race['date'], self.time_formats['date']).strftime(self.time_formats['show'])
@@ -97,9 +104,13 @@ class Get:
         return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country",f"{country}"], tablefmt='plain')
 
     def LastQualifyingResults(self):
-        json_file = requests.get(f"{self.__url}/current/last/qualifying.json").json()
+        """ Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data. """
 
-        results = json2obj(json_file)["MRData"]['RaceTable']['Races'][0]['QualifyingResults']
+        json_requests = requests.get(f"{self.__url}/current/last/qualifying.json").json()
+        json_file = json2obj(json_requests)
+
+        results = json_file["MRData"]['RaceTable']['Races'][0]['QualifyingResults']
+        circuit_name = json_file["MRData"]['RaceTable']['Races'][0]['raceName']
 
         table = []
         for pos, result in enumerate(results, 1):
@@ -110,12 +121,16 @@ class Get:
 
             table.append([f"{pos}", f"{driver_name}", q1, q2, q3])
 
-        return tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center")
+        return (circuit_name, tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
     def LastRaceResults(self):
-        json_file = requests.get(f"{self.__url}/current/last/results.json").json()
+        """ Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data. """
 
-        results = json2obj(json_file)["MRData"]['RaceTable']['Races'][0]['Results']
+        json_requests = requests.get(f"{self.__url}/current/last/results.json").json()
+        json_file = json2obj(json_requests)
+
+        results = json_file["MRData"]['RaceTable']['Races'][0]['Results']
+        circuit_name = json_file["MRData"]['RaceTable']['Races'][0]['raceName']
 
         table = []
         for pos, result in enumerate(results, 1):
@@ -127,9 +142,11 @@ class Get:
 
             table.append([f"{pos}", f"{driver_name}", fl, s_grid, status])
 
-        return tabulate(table, headers=["Pos", "Driver", "FL", "Grid Pos", "Status"], tablefmt='orgtbl', numalign="right", stralign="center")
+        return (circuit_name, tabulate(table, headers=["Pos", "Driver", "FL", "Grid Pos", "Status"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
     def DriverStandings(self, year="current"):
+        """ Returns a string created by 'tabulate' """
+
         json_file = requests.get(f"{self.__url}/{year}/driverStandings.json").json()
 
         _driver_standings = json2obj(json_file)["MRData"]['StandingsTable']['StandingsLists'][0]['DriverStandings']
@@ -143,6 +160,8 @@ class Get:
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
     def ConstructorStandings(self, year="current"):
+        """ Returns a string created by 'tabulate' """
+
         json_file = requests.get(f"{self.__url}/{year}/constructorStandings.json").json()
 
         _constructors_standings = json2obj(json_file)["MRData"]['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
@@ -156,6 +175,8 @@ class Get:
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
     def Calendar(self, year="current"):
+        """ Returns a string created by 'tabulate' """
+
         json_file = requests.get(f"{self.__url}/{year}.json").json()
 
         races = json2obj(json_file)["MRData"]['RaceTable']['Races']
