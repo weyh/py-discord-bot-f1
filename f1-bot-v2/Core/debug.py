@@ -8,39 +8,41 @@ class Debug(object):
     debug = False
 
     @staticmethod
+    def IsArchitecture64bit():
+        return sys.maxsize > 2**32
+
+    @staticmethod
+    def Architecture():
+        return platform.uname().machine
+
+    @staticmethod
     def Clear():
         if platform.system() == 'Windows':
             os.system("cls")
         else:
             os.system("clear")
-        return
 
     @staticmethod
     def Pause():
         print(Style.RESET_ALL)
         input("Press <Enter> key to continue...")
-        return
 
     @staticmethod
     def Exit():
         sys.exit()
-        return
 
     @staticmethod
-    def Log(src, msg, force_debug = False):
+    def Log(src:str, msg, force_debug = False):
         if force_debug or Debug.debug:
             print(Fore.LIGHTWHITE_EX + "> " + src + ": " + str(msg))
-        return
 
     @staticmethod
-    def Warning(src, msg):
+    def Warning(src:str, msg):
         print(Fore.LIGHTYELLOW_EX + "> " + src + ": " + str(msg))
-        return
 
     @staticmethod
-    def Error(src, msg):
+    def Error(src:str, msg):
         print(Fore.LIGHTRED_EX + "> " + src + ": " + str(msg))
-        return
 
     @staticmethod
     def Print(msg, color = Fore.WHITE):
@@ -49,4 +51,20 @@ class Debug(object):
                 print(color + str(m))
         else:
             print(color + str(msg))
-        return
+
+
+    @staticmethod
+    def YesOrNoQuestion(question = "", c_color = ""):
+        valid = {"yes": True, "y": True, "ye": True,
+                 "no": False, "n": False, 'default': True}
+
+        while True:
+            print(c_color + question, end="")
+            choice = input().lower()
+
+            if choice == '':
+                return valid['default']
+            elif choice in valid:
+                return valid[choice]
+            else:
+                Debug.Print("Please respond with 'yes' or 'no' (or 'y' or 'n').\n", Fore.LIGHTYELLOW_EX)

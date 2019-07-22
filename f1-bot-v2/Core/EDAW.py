@@ -50,7 +50,7 @@ class Get:
 
         race = {}
         for i, _race in enumerate(races_json):
-            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < datetime.now():
+            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < current_date:
                 if _race['Circuit']['Location']['country'] == "UAE":
                     return "End of session"
                 else:
@@ -86,12 +86,14 @@ class Get:
     def NextWeek(self):
         """ Returns a string created by 'tabulate' """
 
+        current_date = datetime.now()
+
         json_file = requests.get(f"{self.__url}/current.json").json()
         races_json = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
         race = {}
         for i, _race in enumerate(races_json):
-            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < datetime.now():
+            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < current_date:
                 if _race['Circuit']['Location']['country'] == "UAE":
                     return "End of session"
                 else:

@@ -11,6 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>f1-bot-v2</Name>
     <RootNamespace>f1-bot-v2</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +23,16 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Build\build.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Core\cfg_dictionary.py" />
+    <Compile Include="Core\create_usr_cfg.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\first_start.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Core\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -34,11 +45,17 @@
     <Compile Include="f2_module.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Build\build_configurations.txt" />
+    <Content Include="Build\file_version_info_template.txt" />
     <Content Include="geckodriver.exe" />
     <Content Include="usr.cfg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
+    <Folder Include="Build\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

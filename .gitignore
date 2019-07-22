@@ -332,8 +332,15 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
-f1-bot/usr.cfg
+_temp/
+bin/
 f1-bot/chromedriver.exe
 f1-bot/geckodriver.exe
-f1-bot-v2/usr.cfg
 f1-bot-v2/geckodriver.exe
+*.cfg
+*.kate-swp
+*.swp
+f1-bot-v2/Build/build_configurations.txt
+f1-bot-v2/Build/file_version_info_template.txt
+f1-bot-v2/F1Bot v2.spec
+*.spec

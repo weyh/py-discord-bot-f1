@@ -28,7 +28,6 @@ def update_from_argv(d, version):
                 d.update({parameter:  __str2bool(options.get(parameter))})
             else:
                 d.update({parameter: options.get(parameter)})
-    return
 
 def test(d):
     for parameter in __not_optional_parameters:
@@ -43,7 +42,5 @@ def test(d):
             d.update({parameter: __optional_parameters.get(parameter)})
         elif parameter == "debug":
             d.update({parameter: __str2bool(d.get(parameter))})
-
-    return
 
 __str2bool = lambda v: str(v).lower() in ("yes", "true", "t", "y", "1")

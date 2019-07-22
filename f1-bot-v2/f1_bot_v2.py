@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, requests, time
+import requests, time
 import discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
@@ -12,8 +12,11 @@ from Core import *
 
 splash_screen.show()
 
+if Start("usr.cfg").is_first():
+    UserConfig.Setup_UI()
+
 START_TIME = datetime.now()
-VERSION = "v2.0.1"
+VERSION = "v2.0.2"
 USER_CFG = cfg_dictionary.read()
 
 cfg_dictionary.update_from_argv(USER_CFG, VERSION)
@@ -21,7 +24,7 @@ cfg_dictionary.test(USER_CFG)
 
 Debug.debug = USER_CFG.get("debug")
 HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.get('prefix')}upcoming\n{USER_CFG.get('prefix')}coming_up"],
-                ["The race weekend after the upcoming one:", f"{USER_CFG.get('prefix')}next_week"],
+                ["The race weekend after the upcoming one:", f"{USER_CFG.get('prefix')}following_week \n{USER_CFG.get('prefix')}fw"],
                 ["Current Driver Standings:", f"{USER_CFG.get('prefix')}driver_standings \n{USER_CFG.get('prefix')}ds"],
                 ["Current Constructors Standings:", f"{USER_CFG.get('prefix')}constructors_standings\n{USER_CFG.get('prefix')}constructors \n{USER_CFG.get('prefix')}cs"],
                 ["Championship Calendar:", f"{USER_CFG.get('prefix')}calendar"],
@@ -42,7 +45,6 @@ async def on_ready():
     Debug.Log("SYS", "Bot is ready", True)
     Debug.Log("SYS", "Logging started...")
     Debug.Print("----------------")
-    return
 
 @client.command(aliases=["coming_up"])
 async def upcoming(ctx):
@@ -62,26 +64,24 @@ async def upcoming(ctx):
 
     Debug.Warning("SYS (upcoming)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
-@client.command()
-async def next_week(ctx):
-    Debug.Warning(f"user: {ctx.author}", "Started next_week")
+@client.command(aliases=["fw"])
+async def following_week(ctx):
+    Debug.Warning(f"user: {ctx.author}", "Started following_week")
 
     sw = Stopwatch()
-    race_info = "Next Race:\n"
+    race_info = "Following Week:\n"
     race_info += "```json\n"
 
     race_info += EDAW.Get().NextWeek()
 
     race_info += "```"
 
-    Debug.Log("next_week", race_info)
+    Debug.Log("following_week", race_info)
     await send_msg(ctx, race_info)
 
-    Debug.Warning("SYS (next_week)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Debug.Warning("SYS (following_week)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["ds"])
 async def driver_standings(ctx):
@@ -96,7 +96,6 @@ async def driver_standings(ctx):
 
     Debug.Warning("SYS (driver_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["constructors", "cs"])
 async def constructors_standings(ctx):
@@ -111,7 +110,6 @@ async def constructors_standings(ctx):
 
     Debug.Warning("SYS (constructors_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command()
 async def calendar(ctx):
@@ -126,7 +124,6 @@ async def calendar(ctx):
 
     Debug.Warning("SYS (calendar)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["last_race", "lrr"])
 async def last_race_results(ctx):
@@ -141,7 +138,6 @@ async def last_race_results(ctx):
 
     Debug.Warning("SYS (last_race_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["last_qualifying", "lqr"])
 async def last_qualifying_results(ctx):
@@ -156,7 +152,6 @@ async def last_qualifying_results(ctx):
 
     Debug.Warning("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["short_news"])
 async def news(ctx):
@@ -191,7 +186,6 @@ async def news(ctx):
 
     Debug.Warning("SYS (news)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["f2", "formula2"], pass_context=True)
 async def _f2_modele(ctx, *, message):
@@ -214,7 +208,6 @@ async def _f2_modele(ctx, *, message):
 
     Debug.Warning(f"SYS f2_modele({message})", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command()
 async def uptime(ctx):
@@ -230,7 +223,6 @@ async def uptime(ctx):
 
     Debug.Warning("SYS (uptime)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command(aliases=["clean", "cls"])
 async def clear(ctx):
@@ -247,7 +239,6 @@ async def clear(ctx):
         
     Debug.Warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command()
 async def help(ctx):
@@ -258,7 +249,6 @@ async def help(ctx):
 
     Debug.Warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 @client.command()
 async def version(ctx):
@@ -277,11 +267,9 @@ async def send_embed_msg(ctx, msg):
             await ctx.channel.send(embed=m)
     else:
         await ctx.channel.send(embed=msg)
-    return
 
 async def send_msg(ctx, msg):
     await ctx.channel.send(msg)
-    return
 
 def file_len(fname):
     with open(fname) as f:
@@ -291,7 +279,7 @@ def file_len(fname):
 
 isSiteUp = lambda: requests.head('https://www.autosport.com/f1').status_code == 200
 
-Debug.Warning("Boot", "Version: {VERSION}")
+Debug.Warning("Boot", f"Version: {VERSION}")
 Debug.Log("Boot", f"Token found: {len(USER_CFG.get('token')) != 0}")
 Debug.Log("Boot", f"Time zone: {USER_CFG.get('timezone')}")
 Debug.Log("Boot", f"Site up: {isSiteUp()}")

@@ -1,4 +1,5 @@
 ﻿-i https://pypi.org/simple
+requests
 beautifulsoup4
 bs4
 discord-py

@@ -18,7 +18,7 @@ from Core.debug import Debug
 __addPath = True
 
 HELP_LIST = [["Upcoming race weekend:", "|prefix|f2 upcoming\n|prefix|f2 coming_up"],
-                ["The race weekend after the upcoming one:", "|prefix|f2 next_week"],
+                ["The race weekend after the upcoming one:", "|prefix|f2 following_week \n|prefix|f2 fw"],
                 ["Top 10 from last race:", "|prefix|f2 last_top10"],
                 ["Current Driver Standings:", "|prefix|f2 driver_standings \n|prefix|f2 ds"],
                 ["Championship Calendar:", "|prefix|f2 calendar"],
@@ -28,8 +28,8 @@ HELP_LIST = [["Upcoming race weekend:", "|prefix|f2 upcoming\n|prefix|f2 coming_
 def resolve(msg, USER_CFG):
     if msg == "upcoming" or msg == "coming_up":
         return "str", upcoming(USER_CFG)
-    elif msg == "next_week":
-        return "str", next_week()
+    elif msg == "following_week" or msg == "fw":
+        return "str", following_week()
     elif msg == "last_top10":
         return "str", last_top10()
     elif msg == "driver_standings" or msg == "ds":
@@ -127,6 +127,30 @@ def upcoming(USER_CFG):
     else:
         Debug.Error("SYS (upcoming)", "Site is down")
         race_info = "Error: Unable to reach http://www.fiaformula2.com"
+
+    return race_info
+
+def following_week():
+    race_info = ""
+
+    if isSiteUp():
+        page = requests.get('https://www.autosport.com/f2/calendar')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
+
+        i = 3
+        while i < len(calendar):
+            if len(calendar[i].contents) == 0:
+                n_race = [r.get_text() for r in calendar[i + 1:i + 4]]
+                race_info = tabulate([["Circuit", f"{n_race[1]}"], ["Date",f"{n_race[2]}"]], headers=["Race",f"{n_race[0]}"], tablefmt='plain')
+                break
+            else:
+                i += 4
+
+        Debug.Log("following_week", race_info)
+    else:
+        Debug.Error("SYS (following_week)", "Site is down")
+        race_info = "Error: Unable to reach https://www.autosport.com"
 
     return race_info
 
@@ -230,30 +254,6 @@ def last_top10():
         r_text = "Error: Unable to reach https://www.autosport.com"
 
     return "Last week's top 10: ```" + r_text + "```"
-
-def next_week():
-    race_info = ""
-
-    if isSiteUp():
-        page = requests.get('https://www.autosport.com/f2/calendar')
-        soup = BeautifulSoup(page.content, 'html.parser')
-        calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
-
-        i = 3
-        while i < len(calendar):
-            if len(calendar[i].contents) == 0:
-                n_race = [r.get_text() for r in calendar[i + 1:i + 4]]
-                race_info = tabulate([["Circuit", f"{n_race[1]}"], ["Date",f"{n_race[2]}"]], headers=["Race",f"{n_race[0]}"], tablefmt='plain')
-                break
-            else:
-                i += 4
-
-        Debug.Log("next_week", race_info)
-    else:
-        Debug.Error("SYS (next_week)", "Site is down")
-        race_info = "Error: Unable to reach https://www.autosport.com"
-
-    return race_info
 
 def help(prefix):
     for e in HELP_LIST:
