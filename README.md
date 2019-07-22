@@ -8,7 +8,7 @@ Gives information on upcoming or previous F1, F2 events.
 ## Set up
 
 1. Installation:
-	- Download the correct [release](/releases/latest) for your computer and unpack it.
+	- Download the correct [release](https://github.com/weyh/py-discord-bot-f1/releases/latest) for your computer and unpack it.
 	- Get a [third party Selenium browser driver](https://www.seleniumhq.org/download/) that matches your browser. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz)) Tested browsers: Google Chrome, Mozilla Firefox.*
 		 - On **Windows**, browser driver should be located in the root directory (next to the exe)!
 		 - On **Linux**, browser driver should be copied to `/usr/local/bin`!
