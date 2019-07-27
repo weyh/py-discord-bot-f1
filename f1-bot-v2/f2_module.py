@@ -13,7 +13,7 @@ from datetime import datetime
 from pytz import timezone
 from tabulate import tabulate
 
-from Core.debug import Debug
+from Core import Console
 
 __addPath = True
 
@@ -39,22 +39,22 @@ def resolve(msg, USER_CFG):
     elif msg == "news":
         return "embed", news()
     elif msg == "help":
-        return "str", help(USER_CFG.get('prefix'))
+        return "str", help(USER_CFG.prefix)
 
-    Debug.Error("f2_modele(resolve)", f"Incorrect command \"{msg}\"")
+    Console.error("f2_modele(resolve)", f"Incorrect command \"{msg}\"")
     return "str", f"Incorrect command \"{msg}\""
 
 def upcoming(USER_CFG):
-    if(USER_CFG.get('browser_path') == "undefined"):
-        Debug.Error("SYS (upcoming)", "Browser is not defined!")
-        Debug.Pause()
+    if(USER_CFG.browser_path == "undefined"):
+        Console.error("SYS (upcoming)", "Browser is not defined!")
+        Console.pause()
 
     race_info = "COMING UP:\n"
 
-    if isSiteUp("http://www.fiaformula2.com"):
+    if is_site_up("http://www.fiaformula2.com"):
         global __addPath
 
-        binary = r"%s"%USER_CFG.get('browser_path')
+        binary = r"%s"%USER_CFG.browser_path
 
         if "firefox" in binary.lower():
             options = FirefoxOptions()
@@ -81,8 +81,8 @@ def upcoming(USER_CFG):
             else:
                 driver = webdriver.Chrome(options=options)
         else:
-            Debug.Error("SYS (upcoming)", "Not supported browser!")
-            Debug.Pause()
+            raise Exception("Not supported browser!")
+            Console.Exit()
        
 
         driver.get("http://www.fiaformula2.com")
@@ -119,13 +119,14 @@ def upcoming(USER_CFG):
                         f"Race 2: {free_practices}"
                         )
         
-            Debug.Log("upcoming", race_info)
+            Console.log("upcoming", race_info)
         except TimeoutException:
-              Debug.Error("SYS (upcoming)", "Loading took too much time!")
+            Console.error("SYS (upcoming)", "Loading took too much time!")
+            Console.exit()
         finally:
             driver.quit()
     else:
-        Debug.Error("SYS (upcoming)", "Site is down")
+        Console.error("SYS (upcoming)", "Site is down")
         race_info = "Error: Unable to reach http://www.fiaformula2.com"
 
     return race_info
@@ -133,7 +134,7 @@ def upcoming(USER_CFG):
 def following_week():
     race_info = ""
 
-    if isSiteUp():
+    if is_site_up():
         page = requests.get('https://www.autosport.com/f2/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
         calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
@@ -147,9 +148,9 @@ def following_week():
             else:
                 i += 4
 
-        Debug.Log("following_week", race_info)
+        Console.log("following_week", race_info)
     else:
-        Debug.Error("SYS (following_week)", "Site is down")
+        Console.error("SYS (following_week)", "Site is down")
         race_info = "Error: Unable to reach https://www.autosport.com"
 
     return race_info
@@ -157,7 +158,7 @@ def following_week():
 def calendar():
     race_info = ""
 
-    if isSiteUp():
+    if is_site_up():
         page = requests.get('https://www.autosport.com/f2/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -173,9 +174,9 @@ def calendar():
                     table.append([f"{n_race[0]}", f"{n_race[1]}", f"{n_race[2]}", "■"])
 
         race_info += tabulate(table, headers=["Race", "Circuit", "Date", " "], tablefmt='orgtbl', stralign="center")
-        Debug.Log("calendar", race_info)
+        Console.log("calendar", race_info)
     else:
-        Debug.Error("SYS (calendar)", "Site is down")
+        Console.error("SYS (calendar)", "Site is down")
         race_info = "Error: Unable to reach https://www.autosport.com"
 
     return str("Calendar: ```"+race_info+"```")
@@ -183,7 +184,7 @@ def calendar():
 def news():
     news = []
 
-    if isSiteUp():
+    if is_site_up():
         page = requests.get('https://www.autosport.com/f2')
         soup = BeautifulSoup(page.content, 'html.parser')
         news_soup = list(soup.find('div', class_='columnsContainer').find('div', 'leftColumn').find("div", class_="row small-up-2 medium-up-3").select("div div .newsitem"))[:3]
@@ -199,9 +200,9 @@ def news():
 
             news.append(embed)
 
-        Debug.Log("news", news)
+        Console.log("news", news)
     else:
-        Debug.Error("SYS (news)", "Site is down")
+        Console.error("SYS (news)", "Site is down")
         news = "Error: Unable to reach https://www.autosport.com"
 
     return news
@@ -209,7 +210,7 @@ def news():
 def driver_standings():
     r_text = ""
 
-    if isSiteUp():
+    if is_site_up():
         page = requests.get('https://www.autosport.com/f2/standings')
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -226,9 +227,9 @@ def driver_standings():
             table.append([f"{pos}", f"{driver}", f"{points}"])
 
         r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
-        Debug.Log("driver_standings", r_text)
+        Console.log("driver_standings", r_text)
     else:
-        Debug.Error("SYS (driver_standings)", "Site is down")
+        Console.error("SYS (driver_standings)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
     return "Driver Standings: ```"+r_text+"```"
@@ -236,7 +237,7 @@ def driver_standings():
 def last_top10():
     r_text = ""
 
-    if isSiteUp():
+    if is_site_up():
         page = requests.get('https://www.autosport.com/f2')
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -248,9 +249,9 @@ def last_top10():
             table.append([f"{i}", f"{driver}", f"{team}"])
 
         r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
-        Debug.Log("last_top10", r_text)
+        Console.log("last_top10", r_text)
     else:
-        Debug.Error("SYS (last_top10)", "Site is down")
+        Console.error("SYS (last_top10)", "Site is down")
         r_text = "Error: Unable to reach https://www.autosport.com"
 
     return "Last week's top 10: ```" + r_text + "```"
@@ -260,7 +261,7 @@ def help(prefix):
         e[1] = e[1].replace("|prefix|", prefix)
     return "Help: ```" + tabulate(HELP_LIST, headers=[" ", " "], stralign="left", tablefmt='plain') + "```"
 
-def isSiteUp(url = "https://www.autosport.com/f2"):
+def is_site_up(url = "https://www.autosport.com/f2"):
     return requests.head(url).status_code == 200
 
 def __days_or_day_help(s):

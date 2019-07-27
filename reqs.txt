@@ -5,6 +5,7 @@ bs4
 discord-py
 selenium
 pytz
+tzlocal
 tabulate
 stopwatch.py
 colorama

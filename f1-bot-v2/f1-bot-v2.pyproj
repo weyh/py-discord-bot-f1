@@ -26,22 +26,22 @@
     <Compile Include="Build\build.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\cfg_dictionary.py" />
-    <Compile Include="Core\create_usr_cfg.py">
+    <Compile Include="Core\converter.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\first_start.py">
+    <Compile Include="Core\core.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\user_cfg.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\debug.py" />
     <Compile Include="Core\EDAW.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="f1_bot_v2.py" />
-    <Compile Include="Core\splash_screen.py" />
     <Compile Include="f2_module.py" />
   </ItemGroup>
   <ItemGroup>

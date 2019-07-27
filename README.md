@@ -1,5 +1,4 @@
-﻿
-![bot logo](img/logo.png)
+﻿![bot logo](img/logo.png)
 
 # Discord Formula 1, Formula 2 Bot
 
@@ -20,10 +19,10 @@ Run: `sudo cp geckodriver /usr/local/bin`
 
 3. If you have the token, you can start the bot. (On **Windows** simply open the exe, on **Linux** `./F1Bot_v2` in the cli. [What to do if it's not starting?](#what-to-do-if-its-not-starting)). 
 
-4. After the initial start the bot will start the creation process of a new `usr.cfg` file.
-The file may or may not contain the following parameters: token\*, prefix (default: "--"), timezone (CET, UTC, GMT etc), debug (True/False, default: True), browser_path\*\*
+4. On the initial start the bot will start the creation process of a new `usr.cfg` file.
+The file may or may not contain the following parameters: token\*, prefix (default: "--"), debug (True/False, default: True), browser_path\*\*
 	- '\*': essential
-	- '\*\*' essential if the f2 module will be used.
+	- '\*\*': essential if the f2 module will be used.
 
 
 ## Command Line Arguments
@@ -32,10 +31,10 @@ With command line arguments you can modify the settings of usr.cfg to that speci
 
 | Parameter | Argument |
 | :--- | :--- |
-| Version | `--version` |
-| Help | `-h`, `--help` |
-| Token | `--token` |
-| Timezone | `--timezone` |
+| Version of the bot | `--version` |
+| Help menu | `-h`, `--help` |
+| Bot's token| `--token` |
+| Path of your preferred browser| `--browser_path` |
 | Prefix | `--prefix` |
 | Debug | `--debug` |
 
@@ -44,8 +43,6 @@ Eg.: `F1Bot_v2.exe --prefix=-- --debug=False`
 ## Commands
 
 To access the command list you can always use "--help" in the discord chat.
-
-*Note: You should replace `--` with your prefix.*
 
 **Command List:**
 
@@ -76,6 +73,8 @@ To access the command list you can always use "--help" in the discord chat.
 | News | `--f2 news` |
 | Help | `--f2 help` |
 
+*Note: You should replace `--` with your prefix.*
+
 ## Troubleshooting
 
 Note: **On Mac** the entire repo is not working, for me at least.
@@ -84,8 +83,8 @@ Note: **On Mac** the entire repo is not working, for me at least.
 
 Check if you downloaded the right executable.
 
-- **Linux:** The files are built on **[Ubuntu (64bit), Mint (32bit) and Raspbian (ARM)](img/linux.png)**. Because of all the different distros I cannot test on all of them. If it's not working on yours, you can clone the repo and either build it yourself, or just run the python script. *(From my brief testing with older versions of Ubuntu (16.04 x86/16.10 x64), the problem is the GLIBC version.)*
-- **Windows:** Both files are built in a Win 10  environment. If your are using an older version, there might be some DLLs missing. They are probably [Microsoft Visual C++ 2010 Redistributable Package (x64)](https://www.microsoft.com/en-us/download/details.aspx?id=14632), [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555). If this doesn't fix it, you can clone the repo and try to build it yourself or just run the python script.
+- **Linux:** The files are built on **[Ubuntu (64bit), Mint (32bit) and Raspbian (ARM)](img/linux.png)**. Because of all the different distros I cannot test on all of them. If it's not working on yours, you can clone the repo and either build it yourself, or just run the .py file. *(From my brief testing with older versions of Ubuntu (16.04 x86/16.10 x64), the problem is the GLIBC version.)*
+- **Windows:** Both files are built in a Win 10  environment. If your are using an older version, there might be some DLLs missing. They are probably [Microsoft Visual C++ 2010 Redistributable Package (x64)](https://www.microsoft.com/en-us/download/details.aspx?id=14632), [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555). If this doesn't fix it, you can clone the repo and try to build it yourself or just run the .py file.
 
 #### Clone and build (Additional package required: `pyinstaller`):
 ```bash
@@ -111,9 +110,8 @@ python3 f1_bot_v2.py
 
 ### Sources:
 
-[Ergast Developer API](http://ergast.com/mrd/)
-
-[autosport.com](https://www.autosport.com/f1)
+- [Ergast Developer API](http://ergast.com/mrd/)
+- [autosport.com](https://www.autosport.com/f1)
 
 ---
 
@@ -122,17 +120,7 @@ python3 f1_bot_v2.py
 - [Python (3.7.x)](https://www.python.org)
 - [pyinstaller](https://www.pyinstaller.org)
 
-#### Packages
-
-* [discord.py](https://github.com/Rapptz/discord.py)
-* [requests](https://pypi.org/project/requests/)
-* [bs4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-* [selenium](https://www.seleniumhq.org)
-* [pytz](https://pypi.org/project/pytz/)
-* [python-tabulate](https://github.com/gregbanks/python-tabulate)
-* [stopwatch.py](https://pypi.org/project/stopwatch.py/)
-* [colorama](https://github.com/tartley/colorama)
-
+#### Packages used: [reqs.txt](reqs.txt)
 ---
 
 ### License

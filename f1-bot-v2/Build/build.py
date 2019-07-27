@@ -40,8 +40,8 @@ dirs = {
 }
 
 commands = {
-    "Linux": f'pyinstaller f1_bot_v2.py -n "F1Bot_v2" --onefile --workpath="./{dirs["workpath"]}/linux_{architecture}" --distpath="./{dirs["distpath"]}/linux_{architecture}/{version}"',
-    "Windows": f'pyinstaller f1_bot_v2.py -n "F1Bot_v2" --onefile --workpath="./{dirs["workpath"]}/win_{architecture}" --distpath="./{dirs["distpath"]}/win_{architecture}/{version}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
+    "Linux": f'pyinstaller f1_bot_v2.py -n "F1Bot_v2" --onefile --workpath="./{dirs["workpath"]}/linux_{architecture}" --distpath="./{dirs["distpath"]}/linux_{architecture}"',
+    "Windows": f'pyinstaller f1_bot_v2.py -n "F1Bot_v2" --onefile --workpath="./{dirs["workpath"]}/win_{architecture}" --distpath="./{dirs["distpath"]}/win_{architecture}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
 }
 
 print("---------")
@@ -64,24 +64,24 @@ os.chdir("..")
 print("Copying LICENSE and README...")
 
 if platform.system() == "Windows":
-    shutil.copy2('LICENSE', f"./f1-bot-v2/{dirs['distpath']}/win_{architecture}/{version}/")
-    shutil.copy2('README.md', f"./f1-bot-v2/{dirs['distpath']}/win_{architecture}/{version}/")
+    shutil.copy2('LICENSE', f"./f1-bot-v2/{dirs['distpath']}/win_{architecture}/")
+    shutil.copy2('README.md', f"./f1-bot-v2/{dirs['distpath']}/win_{architecture}/")
 else:
-    shutil.copy2('LICENSE', f"./f1-bot-v2/{dirs['distpath']}/linux_{architecture}/{version}/")
-    shutil.copy2('README.md', f"./f1-bot-v2/{dirs['distpath']}/linux_{architecture}/{version}/")
+    shutil.copy2('LICENSE', f"./f1-bot-v2/{dirs['distpath']}/linux_{architecture}/")
+    shutil.copy2('README.md', f"./f1-bot-v2/{dirs['distpath']}/linux_{architecture}/")
 
 print("Copying - Done!")
 print("Creating archive...")
 
 root_dir = os.getcwd()
-if not os.path.exists(f"{root_dir}/f1-bot-v2/{dirs['distpath']}/archive"):
-    os.mkdir(f"{root_dir}/f1-bot-v2/{dirs['distpath']}/archive")
+if not os.path.exists(f"{root_dir}/f1-bot-v2/Build/archive"):
+    os.mkdir(f"{root_dir}/f1-bot-v2/Build/archive")
 
 if platform.system() == "Windows":
-    os.chdir(f"./f1-bot-v2/{dirs['distpath']}/win_{architecture}/{version}")
-    shutil.make_archive(f"{root_dir}/f1-bot-v2/{dirs['distpath']}/archive/F1Bot_{version}_{architecture}", 'zip')
+    os.chdir(f"./f1-bot-v2/{dirs['distpath']}/win_{architecture}")
+    shutil.make_archive(f"{root_dir}/f1-bot-v2/Build/archive/Windows_F1Bot_{version}_{architecture}", 'zip')
 else:
-    os.chdir(f"./f1-bot-v2/{dirs['distpath']}/linux_{architecture}/{version}/")
-    shutil.make_archive(f"{root_dir}/f1-bot-v2/{dirs['distpath']}/archive/F1Bot_{version}_{architecture}", 'gztar')
+    os.chdir(f"./f1-bot-v2/{dirs['distpath']}/linux_{architecture}")
+    shutil.make_archive(f"{root_dir}/f1-bot-v2/Build/archive/Linux_F1Bot_{version}_{architecture}", 'gztar')
 
 print("Done!")

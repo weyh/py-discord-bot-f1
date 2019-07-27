@@ -334,6 +334,7 @@ ASALocalRun/
 .localhistory/
 _temp/
 bin/
+archive/
 f1-bot/chromedriver.exe
 f1-bot/geckodriver.exe
 f1-bot-v2/geckodriver.exe

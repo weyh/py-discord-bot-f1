@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
-"""
-Ergast Developer API Custom Wrapper
-"""
+'Ergast Developer API Custom Wrapper'
 
 import requests, json, time
 from collections import namedtuple
-from pytz import timezone
 from tabulate import tabulate
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+from Core import converter as Conv
+
 class Get:
-    def __init__(self, timezone = "CET"):
-        self.timezone = timezone
+    def __init__(self):
         self.time_formats = {'date' : "%Y-%m-%d", 'time' : "%H:%M:%S", 'combined' : "%Y-%m-%d %H:%M:%S", 'show' : "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
         self.__url = r"http://ergast.com/api/f1"
 
-    def __localTime(self, time):
-        return time.astimezone(timezone(self.timezone))
-
-    def Upcoming(self):
-        """ Returns a string created by 'tabulate' """
+    def Upcoming(self) -> str:
+        'Returns a string created by "tabulate"'
 
         show_format_0 = "%a %d %b"
         show_format_1 = "%H:%M"
@@ -34,14 +29,14 @@ class Get:
         schedule_start = [d.find("td", class_="text-right").get("data-start") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
         schedule_end = [d.find("td", class_="text-right").get("data-end") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
 
-        free_practices_start = [self.__localTime(datetime.strptime(d, self.time_formats['long'])) for d in schedule_start[:3]]
-        free_practices_end = [self.__localTime(datetime.strptime(d, self.time_formats['long'])) for d in schedule_end[:3]]
-        qualifyings_start = [self.__localTime(datetime.strptime(d, self.time_formats['long'])) for d in schedule_start[3:6]]
-        qualifyings_end = [self.__localTime(datetime.strptime(d, self.time_formats['long'])) for d in schedule_end[3:6]]
-        race_start = self.__localTime(datetime.strptime(schedule_start[6], self.time_formats['long']))
-        race_end = self.__localTime(datetime.strptime(schedule_end[6], self.time_formats['long']))
+        free_practices_start = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_start[:3]]
+        free_practices_end = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_end[:3]]
+        qualifyings_start = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_start[3:6]]
+        qualifyings_end = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_end[3:6]]
+        race_start = Conv.to_local_timzone(datetime.strptime(schedule_start[6], self.time_formats['long']))
+        race_end = Conv.to_local_timzone(datetime.strptime(schedule_end[6], self.time_formats['long']))
 
-        race_starts_in = str(race_start - datetime.now(timezone(self.timezone))).split('.')[0]        
+        race_starts_in = str(race_start - Conv.to_local_timzone(datetime.utcnow())).split('.')[0]
         track_info = [d.get_text() for d in coming_up_div.select("ul li")][2].split(': ')[1]
 
         # getting data from api
@@ -83,8 +78,8 @@ class Get:
 
         return race_info
 
-    def NextWeek(self):
-        """ Returns a string created by 'tabulate' """
+    def NextWeek(self) -> str:
+        'Returns a string created by "tabulate"'
 
         current_date = datetime.now()
 
@@ -106,7 +101,7 @@ class Get:
         return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country",f"{country}"], tablefmt='plain')
 
     def LastQualifyingResults(self):
-        """ Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data. """
+        'Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data.'
 
         json_requests = requests.get(f"{self.__url}/current/last/qualifying.json").json()
         json_file = json2obj(json_requests)
@@ -125,8 +120,8 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
-    def LastRaceResults(self):
-        """ Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data. """
+    def LastRaceResults(self) -> tuple:
+        'Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data.'
 
         json_requests = requests.get(f"{self.__url}/current/last/results.json").json()
         json_file = json2obj(json_requests)
@@ -146,8 +141,8 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "FL", "Grid Pos", "Status"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
-    def DriverStandings(self, year="current"):
-        """ Returns a string created by 'tabulate' """
+    def DriverStandings(self, year="current") -> str:
+        'Returns a string created by "tabulate"'
 
         json_file = requests.get(f"{self.__url}/{year}/driverStandings.json").json()
 
@@ -161,8 +156,8 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
-    def ConstructorStandings(self, year="current"):
-        """ Returns a string created by 'tabulate' """
+    def ConstructorStandings(self, year="current") -> str:
+        'Returns a string created by "tabulate"'
 
         json_file = requests.get(f"{self.__url}/{year}/constructorStandings.json").json()
 
@@ -176,8 +171,8 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
-    def Calendar(self, year="current"):
-        """ Returns a string created by 'tabulate' """
+    def Calendar(self, year="current") -> str:
+        'Returns a string created by "tabulate"'
 
         json_file = requests.get(f"{self.__url}/{year}.json").json()
 
