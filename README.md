@@ -8,19 +8,17 @@ Gives information on upcoming or previous F1, F2 events.
 
 1. Installation:
 	- Download the correct [release](https://github.com/weyh/py-discord-bot-f1/releases/latest) for your computer and unpack it.
-	- Get a [third party Selenium browser driver](https://www.seleniumhq.org/download/) that matches your browser. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz)) Tested browsers: Google Chrome, Mozilla Firefox.*
+	- If you want to use the f2_module, you need to get a [third party Selenium browser driver](https://www.seleniumhq.org/download/) that matches your browser. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz), *Unfortunately "marionette" does not seem to work on the ARM Geckodriver builds, so each time a function (which uses selenium) runs a new instance of the browser will be launched.*) **Tested browsers:** Google Chrome, Mozilla Firefox.*
 		 - On **Windows**, browser driver should be located in the root directory (next to the exe)!
 		 - On **Linux**, browser driver should be copied to `/usr/local/bin`!
 Run: `sudo cp geckodriver /usr/local/bin`
 
-*Unfortunately "marionette" does not seem to work on the ARM Geckodriver builds, so each time a function (which uses selenium) runs a new instance of the browser will be launched.*
-
 2. After downloading the files, you need to create a [new discord application](https://discordapp.com/developers/applications/) and get the bot's token. *([Creating a discord bot & getting a token](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token))*
 
-3. If you have the token, you can start the bot. (On **Windows** simply open the exe, on **Linux** `./F1Bot_v2` in the cli. [What to do if it's not starting?](#what-to-do-if-its-not-starting)). 
+3. If you have the token, you can start the bot. (On **Windows** simply open the .exe, on **Linux** `./F1Bot_v2` in the cli. [What to do if it's not starting?](#what-to-do-if-its-not-starting)). 
 
 4. On the initial start the bot will start the creation process of a new `usr.cfg` file.
-The file may or may not contain the following parameters: token\*, prefix (default: "--"), debug (True/False, default: True), browser_path\*\*
+The file contains the following parameters: token\*, prefix (default: "--"), debug (True/False, default: False), cache (default: True), cache_time_delta (default: 30 min), browser_path\*\*
 	- '\*': essential
 	- '\*\*': essential if the f2 module will be used.
 
@@ -33,12 +31,17 @@ With command line arguments you can modify the settings of usr.cfg to that speci
 | :--- | :--- |
 | Version of the bot | `--version` |
 | Help menu | `-h`, `--help` |
-| Bot's token| `--token` |
-| Path of your preferred browser| `--browser_path` |
-| Prefix | `--prefix` |
-| Debug | `--debug` |
+| Bot's token| `-t`, `--token` |
+| Prefix | `-p`, `--prefix` |
+| Debug | `-d`, `--debug` |
+| Cache| `-c`, `--cache` |
+| Caching time delta \* | `-C`, `--cache_time_delta` |
+| Path of your preferred browser| `-b`, `--browser_path` |
 
-Eg.: `F1Bot_v2.exe --prefix=-- --debug=False`
+\*: The time while the cached data is valid.
+
+Eg.: `F1Bot_v2.exe --prefix=-- -d -C 10`
+In this case: **prefix:** "--", **debug:** True, **caching time delta:** 10 sec.
 
 ## Commands
 

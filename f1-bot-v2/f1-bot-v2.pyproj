@@ -26,6 +26,9 @@
     <Compile Include="Build\build.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\cache_manager.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Core\converter.py">
       <SubType>Code</SubType>
     </Compile>

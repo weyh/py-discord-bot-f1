@@ -9,7 +9,7 @@ from stopwatch import Stopwatch
 
 from Core import *
 
-VERSION = "v2.0.3"
+VERSION = "v2.0.4"
 START_TIME = datetime.now()
 
 #args
@@ -24,6 +24,8 @@ else:
 USER_CFG.update(args)
 
 Console.debug = USER_CFG.debug
+CacheManager.cache_enabled = USER_CFG.cache
+CacheManager.time_delta = USER_CFG.cache_time_delta
 HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.prefix}upcoming\n{USER_CFG.prefix}coming_up"],
                 ["The race weekend after the upcoming one:", f"{USER_CFG.prefix}following_week \n{USER_CFG.prefix}fw"],
                 ["Current Driver Standings:", f"{USER_CFG.prefix}driver_standings \n{USER_CFG.prefix}ds"],
@@ -32,6 +34,7 @@ HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.prefix}upcoming\n{USER_CFG.p
                 ["Last Race Results:", f"{USER_CFG.prefix}last_race_results\n{USER_CFG.prefix}last_race\n{USER_CFG.prefix}lrr"],
                 ["Last Qualifying Results:", f"{USER_CFG.prefix}last_qualifying_results\n{USER_CFG.prefix}last_qualifying\n{USER_CFG.prefix}lqr"],
                 ["News:", f"{USER_CFG.prefix}news"],
+                ["Clear cache:", f"{USER_CFG.prefix}clear_cache"],
                 ["Clear:", f"{USER_CFG.prefix}clear\n{USER_CFG.prefix}clean\n{USER_CFG.prefix}cls"],                
                 ["Uptime:", f"{USER_CFG.prefix}uptime"],
                 ["Version:", f"{USER_CFG.prefix}version"],
@@ -52,15 +55,23 @@ async def upcoming(ctx):
     Console.warning(f"user: {ctx.author}", "Started upcoming")
 
     sw = Stopwatch()
-    race_info = "Coming Up:\n"
-    race_info += "```json\n"
 
-    race_info += EDAW.Get().Upcoming()
+    if CacheManager.valid_cache_exists("upcoming"):
+        Console.log("upcoming", "From cache.")
+        race_info = CacheManager.load("upcoming").data
+    else:
+        race_info = "Coming Up:\n"
+        race_info += "```json\n"
 
-    race_info += "```"
+        race_info += EDAW.Get().Upcoming()
+
+        race_info += "```"
+        
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "upcoming", race_info)
+            c.save()
 
     Console.log("upcoming", race_info)
-
     await send_msg(ctx, race_info)
 
     Console.warning("SYS (upcoming)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
@@ -71,12 +82,21 @@ async def following_week(ctx):
     Console.warning(f"user: {ctx.author}", "Started following_week")
 
     sw = Stopwatch()
-    race_info = "Following Week:\n"
-    race_info += "```json\n"
 
-    race_info += EDAW.Get().NextWeek()
+    if CacheManager.valid_cache_exists("following_week"):
+        Console.log("following_week", "From cache.")
+        race_info = CacheManager.load("following_week").data
+    else:
+        race_info = "Following Week:\n"
+        race_info += "```json\n"
 
-    race_info += "```"
+        race_info += EDAW.Get().NextWeek()
+
+        race_info += "```"
+
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "following_week", race_info)
+            c.save()
 
     Console.log("following_week", race_info)
     await send_msg(ctx, race_info)
@@ -89,8 +109,15 @@ async def driver_standings(ctx):
     Console.warning(f"user: {ctx.author}", "Started driver_standings")
 
     sw = Stopwatch()
+    if CacheManager.valid_cache_exists("driver_standings"):
+        Console.log("driver_standings", "From cache.")
+        ds = CacheManager.load("driver_standings").data
+    else:
+        ds = EDAW.Get().DriverStandings()
 
-    ds = EDAW.Get().DriverStandings()
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "driver_standings", ds)
+            c.save()
 
     Console.log("driver_standings", ds)
     await send_msg(ctx, "Driver Standings:\n```" + ds + "```")
@@ -104,7 +131,15 @@ async def constructors_standings(ctx):
 
     sw = Stopwatch()
 
-    cs = EDAW.Get().ConstructorStandings()
+    if CacheManager.valid_cache_exists("constructors_standings"):
+        Console.log("constructors_standings", "From cache.")
+        cs = CacheManager.load("constructors_standings").data
+    else:
+        cs = EDAW.Get().ConstructorStandings()
+
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "constructors_standings", cs)
+            c.save()
 
     Console.log("constructors_standings", cs)
     await send_msg(ctx, "Constructors Standings:\n```" + cs + "```")
@@ -118,7 +153,15 @@ async def calendar(ctx):
 
     sw = Stopwatch()
 
-    _calendar = EDAW.Get().Calendar()
+    if CacheManager.valid_cache_exists("calendar"):
+        Console.log("calendar", "From cache.")
+        _calendar = CacheManager.load("calendar").data
+    else:
+        _calendar = EDAW.Get().Calendar()
+
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "calendar", _calendar)
+            c.save()
 
     Console.log("calendar", _calendar)
     await send_msg(ctx, "Calendar:\n```" + _calendar + "```")
@@ -132,10 +175,18 @@ async def last_race_results(ctx):
 
     sw = Stopwatch()
 
-    lrr = EDAW.Get().LastRaceResults()
+    if CacheManager.valid_cache_exists("last_race_results"):
+        Console.log("last_race_results", "From cache.")
+        lrr = CacheManager.load("last_race_results").data
+    else:
+        lrr = EDAW.Get().LastRaceResults()[1]
 
-    Console.log("last_race_results", lrr[1])
-    await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```" + lrr[1] + "```")
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "last_race_results", lrr)
+            c.save()
+
+    Console.log("last_race_results", lrr)
+    await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```" + lrr + "```")
 
     Console.warning("SYS (last_race_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -146,10 +197,18 @@ async def last_qualifying_results(ctx):
 
     sw = Stopwatch()
 
-    lqr = EDAW.Get().LastQualifyingResults()
+    if CacheManager.valid_cache_exists("last_qualifying_results"):
+        Console.log("last_qualifying_results", "From cache.")
+        lqr = CacheManager.load("last_qualifying_results").data
+    else:
+        lqr = EDAW.Get().LastQualifyingResults()[1]
 
-    Console.log("last_qualifying_results", lqr[1])
-    await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```" + lqr[1] + "```")
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "last_qualifying_results", lqr)
+            c.save()
+
+    Console.log("last_qualifying_results", lqr)
+    await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```" + lqr + "```")
 
     Console.warning("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -225,6 +284,18 @@ async def uptime(ctx):
     Console.warning("SYS (uptime)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
+@client.command()
+async def clear_cache(ctx):
+    Console.warning(f"user: {ctx.author}", "Started clear_cache")
+
+    sw = Stopwatch()
+
+    CacheManager.clear()
+        
+    Console.warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    sw.reset()
+
+
 @client.command(aliases=["clean", "cls"])
 async def clear(ctx):
     Console.warning(f"user: {ctx.author}", "Started clear")
@@ -276,8 +347,13 @@ is_site_up = lambda: requests.head('https://www.autosport.com/f1').status_code =
 
 Console.warning("Boot", f"Version: {VERSION}")
 Console.log("Boot", f"Token found: {len(USER_CFG.token) != 0}")
+Console.log("Boot", f"Prefix: {USER_CFG.prefix}")
+Console.log("Boot", f"Debug: {USER_CFG.debug}")
+Console.log("Boot", f"Cache: {USER_CFG.cache}")
+Console.log("Boot", f"Cache time delta: {USER_CFG.cache_time_delta} sec")
+Console.log("Boot", f"Browser path: {USER_CFG.browser_path}")
 Console.log("Boot", f"Time zone: {time.tzname[0]}")
 Console.log("Boot", f"Site up: {is_site_up()}")
-Console.log("Boot", f"Prefix: {USER_CFG.prefix}")
+
 
 client.run(USER_CFG.token)

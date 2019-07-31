@@ -13,7 +13,7 @@ from datetime import datetime
 from pytz import timezone
 from tabulate import tabulate
 
-from Core import Console
+from Core import Console, Cache, CacheManager
 
 __addPath = True
 
@@ -46,11 +46,14 @@ def resolve(msg, USER_CFG):
 
 def upcoming(USER_CFG):
     if(USER_CFG.browser_path == "undefined"):
-        Console.error("SYS (upcoming)", "Browser is not defined!")
+        Console.error("SYS (f2_upcoming)", "Browser is not defined!")
         Console.pause()
 
-    race_info = "COMING UP:\n"
+    if CacheManager.valid_cache_exists("f2_upcoming"):
+        Console.log("f2_upcoming", "From cache.")
+        return CacheManager.load("f2_upcoming").data
 
+    race_info = "COMING UP:\n"
     if is_site_up("http://www.fiaformula2.com"):
         global __addPath
 
@@ -119,21 +122,39 @@ def upcoming(USER_CFG):
                         f"Race 2: {free_practices}"
                         )
         
-            Console.log("upcoming", race_info)
+            Console.log("f2_upcoming", race_info)
+
+            if CacheManager.cache_enabled:
+                c = Cache(str(datetime.now()), "f2_upcoming", race_info)
+                c.save()
         except TimeoutException:
-            Console.error("SYS (upcoming)", "Loading took too much time!")
-            Console.exit()
+            Console.error("SYS (f2_upcoming)", "Loading took too much time!")
+
+            if os.path.exists(f"./cache/f2_upcoming.json"):
+                Console.log("f2_upcoming", "From cache.")
+                race_info = CacheManager.load("f2_upcoming").data
+            else:
+                raise TimeoutException("Loading took too much time!")
         finally:
             driver.quit()
     else:
-        Console.error("SYS (upcoming)", "Site is down")
-        race_info = "Error: Unable to reach http://www.fiaformula2.com"
+        Console.error("SYS (upcoming)", "Site is down")            
+
+        if os.path.exists(f"./cache/f2_upcoming.json"):
+            Console.warning("SYS (f2_upcoming)", "Loaded from cache!") 
+            race_info = CacheManager.load("f2_upcoming").data
+        else:
+            race_info = "Error: Unable to reach http://www.fiaformula2.com"
 
     return race_info
 
 def following_week():
     race_info = ""
 
+    if CacheManager.valid_cache_exists("f2_following_week"):
+        Console.log("f2_following_week", "From cache.")
+        return CacheManager.load("f2_following_week").data
+    
     if is_site_up():
         page = requests.get('https://www.autosport.com/f2/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -148,16 +169,28 @@ def following_week():
             else:
                 i += 4
 
-        Console.log("following_week", race_info)
+        Console.log("f2_following_week", race_info)
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "f2_following_week", race_info)
+            c.save()
     else:
         Console.error("SYS (following_week)", "Site is down")
-        race_info = "Error: Unable to reach https://www.autosport.com"
+
+        if os.path.exists(f"./cache/f2_following_week.json"):
+            Console.warning("SYS (f2_following_week)", "Loaded from cache!") 
+            race_info = CacheManager.load("f2_following_week").data
+        else:
+            race_info = "Error: Unable to reach http://www.fiaformula2.com"
 
     return race_info
 
 def calendar():
     race_info = ""
 
+    if CacheManager.valid_cache_exists("f2_calendar"):
+        Console.log("f2_calendar", "From cache.")
+        return f"Calendar: ```{CacheManager.load('f2_calendar').data}```"
+    
     if is_site_up():
         page = requests.get('https://www.autosport.com/f2/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -174,12 +207,96 @@ def calendar():
                     table.append([f"{n_race[0]}", f"{n_race[1]}", f"{n_race[2]}", "■"])
 
         race_info += tabulate(table, headers=["Race", "Circuit", "Date", " "], tablefmt='orgtbl', stralign="center")
-        Console.log("calendar", race_info)
-    else:
-        Console.error("SYS (calendar)", "Site is down")
-        race_info = "Error: Unable to reach https://www.autosport.com"
 
-    return str("Calendar: ```"+race_info+"```")
+        Console.log("f2_calendar", race_info)
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "f2_calendar", race_info)
+            c.save()
+    else:
+        Console.error("SYS (f2_calendar)", "Site is down")
+
+        if os.path.exists(f"./cache/f2_calendar.json"):
+            Console.warning("SYS (f2_calendar)", "Loaded from cache!") 
+            race_info = CacheManager.load("f2_calendar").data
+        else:
+            race_info = "Error: Unable to reach http://www.fiaformula2.com"
+
+    return f"Calendar: ```{race_info}```"
+
+def driver_standings():
+    r_text = ""
+
+    if CacheManager.valid_cache_exists("f2_driver_standings"):
+        Console.log("f2_driver_standings", "From cache.")
+        return f"Driver Standings: ```{CacheManager.load('f2_driver_standings').data}```"
+    
+    if is_site_up():
+        page = requests.get('https://www.autosport.com/f2/standings')
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        _driver_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(1) tbody tr")[1:]
+
+        table = []
+        for tr in _driver_standings:
+            pos = tr.select("td:nth-child(1)")[0].get_text()
+            if pos == "Pos": # somehow there is a "Pos" in the soup
+                break
+            driver = tr.select("td:nth-child(2) a")[0].get_text()
+            points = tr.select("td:nth-child(3)")[0].get_text()
+
+            table.append([f"{pos}", f"{driver}", f"{points}"])
+
+        r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
+
+        Console.log("f2_driver_standings", r_text)
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "f2_driver_standings", r_text)
+            c.save()
+    else:
+        Console.error("SYS (f2_driver_standings)", "Site is down")
+
+        if os.path.exists(f"./cache/f2_driver_standings.json"):
+            Console.warning("SYS (f2_driver_standings)", "Loaded from cache!") 
+            r_text = CacheManager.load("f2_driver_standings").data
+        else:
+            r_text = "Error: Unable to reach http://www.fiaformula2.com"
+
+    return f"Driver Standings: ```{r_text}```"
+
+def last_top10():
+    r_text = ""
+
+    if CacheManager.valid_cache_exists("f2_last_top10"):
+        Console.log("f2_last_top10", "From cache.")
+        return f"Last week's top 10: ```{CacheManager.load('f2_last_top10').data}```"
+    
+    if is_site_up():
+        page = requests.get('https://www.autosport.com/f2')
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        drivers = [d.get_text() for d in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(2) a")]
+        teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
+
+        table = []
+        for i, (driver, team) in enumerate(zip(drivers, teams), start=1):
+            table.append([f"{i}", f"{driver}"])
+
+        r_text += tabulate(table, headers=["Pos", "Driver"], tablefmt='orgtbl', numalign="right", stralign="center")
+
+        Console.log("f2_last_top10", r_text)
+        if CacheManager.cache_enabled:
+            c = Cache(str(datetime.now()), "f2_last_top10", r_text)
+            c.save()
+    else:
+        Console.error("SYS (f2_last_top10)", "Site is down")
+        
+        if os.path.exists(f"./cache/f2_last_top10.json"):
+            Console.warning("SYS (f2_last_top10)", "Loaded from cache!") 
+            r_text = CacheManager.load("f2_last_top10").data
+        else:
+            r_text = "Error: Unable to reach http://www.fiaformula2.com"
+
+    return "Last week's top 10: ```" + r_text + "```"
 
 def news():
     news = []
@@ -206,55 +323,6 @@ def news():
         news = "Error: Unable to reach https://www.autosport.com"
 
     return news
-
-def driver_standings():
-    r_text = ""
-
-    if is_site_up():
-        page = requests.get('https://www.autosport.com/f2/standings')
-        soup = BeautifulSoup(page.content, 'html.parser')
-
-        _driver_standings = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table:nth-child(1) tbody tr")[1:]
-
-        table = []
-        for tr in _driver_standings:
-            pos = tr.select("td:nth-child(1)")[0].get_text()
-            if pos == "Pos": # somehow there is a "Pos" in the soup
-                break
-            driver = tr.select("td:nth-child(2) a")[0].get_text()
-            points = tr.select("td:nth-child(3)")[0].get_text()
-
-            table.append([f"{pos}", f"{driver}", f"{points}"])
-
-        r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
-        Console.log("driver_standings", r_text)
-    else:
-        Console.error("SYS (driver_standings)", "Site is down")
-        r_text = "Error: Unable to reach https://www.autosport.com"
-
-    return "Driver Standings: ```"+r_text+"```"
-
-def last_top10():
-    r_text = ""
-
-    if is_site_up():
-        page = requests.get('https://www.autosport.com/f2')
-        soup = BeautifulSoup(page.content, 'html.parser')
-
-        drivers = [d.get_text() for d in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(2) a")]
-        teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
-
-        table = []
-        for i, (driver, team) in enumerate(zip(drivers, teams), start=1):
-            table.append([f"{i}", f"{driver}", f"{team}"])
-
-        r_text += tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
-        Console.log("last_top10", r_text)
-    else:
-        Console.error("SYS (last_top10)", "Site is down")
-        r_text = "Error: Unable to reach https://www.autosport.com"
-
-    return "Last week's top 10: ```" + r_text + "```"
 
 def help(prefix):
     for e in HELP_LIST:

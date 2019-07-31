@@ -91,11 +91,15 @@ class Start:
             return
 
         parser = OptionParser(version = version)
-        parser.add_option("--token", dest="token", help="Discord bot token", metavar="{token}"),
-        parser.add_option("--prefix", dest="prefix", help="Discord chat prefix to access the bot (default: --)", metavar="{prefix}")
-        parser.add_option("--debug", dest="debug", help="Turn debug mode on/off", metavar="True/False")
-        parser.add_option("--browser_path", dest="browser_path", help="browser path", metavar="{browser_path}")
+        parser.add_option("-t", "--token", dest="token", help="Discord bot token", metavar="TOKEN")
+
+        parser.add_option("-p", "--prefix", dest="prefix", help="Discord chat prefix to access the bot (default: '--')", metavar="PREFIX")
+        parser.add_option("-d", "--debug", dest="debug", action="store_true", help="Turn debug mode on/off (default: False)", metavar="True/False")
+
+        parser.add_option("-c", "--cache", dest="cache", help="Turn caching on/off (default: True)", metavar="True/False")
+        parser.add_option("-C", "--cache_time_delta", dest="cache_time_delta", help="The time while the cached data is valid (default: 1800 sec)", metavar="CACHE_TIME_DELTA")
+
+        parser.add_option("-b", "--browser_path", dest="browser_path", help="Path of your preferred browser", metavar="BROWSER_PATH")
 
         (options, args) = parser.parse_args()
-        
         return vars(options)

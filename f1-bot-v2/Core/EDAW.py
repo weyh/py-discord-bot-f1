@@ -100,8 +100,8 @@ class Get:
 
         return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country",f"{country}"], tablefmt='plain')
 
-    def LastQualifyingResults(self):
-        'Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data.'
+    def LastQualifyingResults(self) -> tuple:
+        'Returns the place where the race qualifying was hosted and the data.'
 
         json_requests = requests.get(f"{self.__url}/current/last/qualifying.json").json()
         json_file = json2obj(json_requests)
@@ -112,16 +112,16 @@ class Get:
         table = []
         for pos, result in enumerate(results, 1):
             driver_name = f"{result['Driver']['givenName']} {result['Driver']['familyName']}"
-            q1 = result['Q1'] if 'Q1' in result else "-"
-            q2 = result['Q2'] if 'Q2' in result else "-"
-            q3 = result['Q3'] if 'Q3' in result else "-"
+            q1 = result['Q1'] if 'Q1' in result and result['Q1'] != "" else "-"
+            q2 = result['Q2'] if 'Q2' in result and result['Q1'] != "" else "-"
+            q3 = result['Q3'] if 'Q3' in result and result['Q1'] != "" else "-"
 
             table.append([f"{pos}", f"{driver_name}", q1, q2, q3])
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
     def LastRaceResults(self) -> tuple:
-        'Returns a tuple. 1st index is the place where the race was hosted, 2nd is the data.'
+        'Returns the place where the race was hosted and the data.'
 
         json_requests = requests.get(f"{self.__url}/current/last/results.json").json()
         json_file = json2obj(json_requests)
@@ -135,7 +135,10 @@ class Get:
             s_grid = result['grid'] if result['grid'] != "0" else "Pit"
             status = result['status']
 
-            fl = "■■" if result['FastestLap']['rank'] == "1" else ""
+            try:
+                fl = "■■" if result['FastestLap']['rank'] == "1" else ""
+            except:
+                fl = ""
 
             table.append([f"{pos}", f"{driver_name}", fl, s_grid, status])
 

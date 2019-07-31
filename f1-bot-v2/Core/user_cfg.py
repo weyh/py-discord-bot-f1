@@ -5,10 +5,12 @@ from Core import converter as Conv
 from colorama import Fore
 
 class UserConfig:
-    def __init__(self, token:str, prefix:str, debug:bool, browser_path:str):
+    def __init__(self, token:str, prefix:str, debug:bool, cache:bool, cache_time_delta:float, browser_path:str):
         self.token = token
         self.prefix = prefix
         self.debug = debug if type(debug) == bool else Conv.strtbool(debug)
+        self.cache = cache if type(cache) == bool else Conv.strtbool(cache)
+        self.cache_time_delta = float(cache_time_delta)
         self.browser_path = browser_path
     
     def save(self):
@@ -20,20 +22,23 @@ class UserConfig:
         if invar is None:
             return
 
-        if type(invar) is tuple:
-            invar = dict(invar)
-        self.__dict__.update((k,v) for k,v in invar.iteritems() if v is not None)
+        self.__dict__.update((k,v) for k,v in invar.items() if v is not None)
 
     @staticmethod
     def load():
         'Loads user config and returns it as UserConfig class'
-        return Conv.json_to_obj("usr.cfg") 
+        try:
+            return Conv.json_to_obj("usr.cfg")
+        except Exception as e:
+            Console.error("UserConfig (load)", f"Load Error: {e}")
+            return UserConfig.creation_ui("corrupted")
+
 
     @staticmethod
-    def creation_ui():
+    def creation_ui(txt="missing"):
         'UI for creating a usr.cfg file. Returns the newly created UserConfig class.'
 
-        Console.warning("UserConfig", "'usr.cfg' file is missing!")
+        Console.warning("UserConfig", f"'usr.cfg' file is {txt}!")
 
         if(not Console.yes_or_no("Do you wish to create it (Y/n)? ", Fore.LIGHTYELLOW_EX)):
             raise Exception("'usr.cfg' file is missing! The application cannot be started!")
@@ -54,12 +59,16 @@ class UserConfig:
                     Console.printc("Token is not optional! Please enter your token.", Fore.LIGHTYELLOW_EX)
 
             prefix = input("Prefix (default: '--'): ")
-            debug = input("Debug (True/False, default: True): ")
+            debug = input("Debug (True/False, default: False): ")
+            cache = input("Caching (True/False, default: True): ")
+            cache_td = input("Caching time delta (default: 1800 sec): ")
             browser_path = input("Browser's path (**): ")
 
             # var validation
             prefix = prefix if prefix != "" else "--"
-            debug = debug if debug != "" else True
+            debug = debug if debug != "" else False
+            cache = cache if cache != "" else True
+            cache_td = cache_td if cache_td != "" else 1800
             browser_path = browser_path if browser_path != "" else "undefined"
 
             print("-------------------------------------------------------------------\n"+
@@ -67,13 +76,15 @@ class UserConfig:
                   f"token={token}\n"+
                   f"prefix={prefix}\n"+
                   f"debug={debug}\n"+
+                  f"caching={cache}\n"+
+                  f"cache_time_delta={cache_td}\n"+
                   f"browser_path={browser_path}\n"+
                   "-------------------------------------------------------------------")
             
             print("")
             done = Console.yes_or_no("Save and continue (Y/n)? ")        
 
-        usr_c = UserConfig(token, prefix, debug, browser_path)
+        usr_c = UserConfig(token, prefix, debug, cache, cache_td, browser_path)
         usr_c.save()
         print("DONE!")
         return usr_c
