@@ -32,7 +32,7 @@
     <Compile Include="Core\converter.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\core.py">
+    <Compile Include="Core\_core.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\user_cfg.py">

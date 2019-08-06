@@ -9,14 +9,17 @@ from bs4 import BeautifulSoup
 
 from Core import converter as Conv
 
+
 class Get:
-    def __init__(self):
-        self.time_formats = {'date' : "%Y-%m-%d", 'time' : "%H:%M:%S", 'combined' : "%Y-%m-%d %H:%M:%S", 'show' : "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
-        self.__url = r"http://ergast.com/api/f1"
+    time_formats = {'date': "%Y-%m-%d", 'time': "%H:%M:%S", 'combined': "%Y-%m-%d %H:%M:%S", 'show': "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
+    __url = r"http://ergast.com/api/f1"
 
-    def Upcoming(self) -> str:
-        'Returns a string created by "tabulate"'
+    #def __init__(self):
+    #    self.time_formats = {'date': "%Y-%m-%d", 'time': "%H:%M:%S", 'combined': "%Y-%m-%d %H:%M:%S", 'show': "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
+    #    self.__url = r"http://ergast.com/api/f1"
 
+    def Upcoming() -> str:
+        'Returns the next race weekend'
         show_format_0 = "%a %d %b"
         show_format_1 = "%H:%M"
         current_date = datetime.now()
@@ -29,81 +32,85 @@ class Get:
         schedule_start = [d.find("td", class_="text-right").get("data-start") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
         schedule_end = [d.find("td", class_="text-right").get("data-end") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
 
-        free_practices_start = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_start[:3]]
-        free_practices_end = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_end[:3]]
-        qualifyings_start = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_start[3:6]]
-        qualifyings_end = [Conv.to_local_timzone(datetime.strptime(d, self.time_formats['long'])) for d in schedule_end[3:6]]
-        race_start = Conv.to_local_timzone(datetime.strptime(schedule_start[6], self.time_formats['long']))
-        race_end = Conv.to_local_timzone(datetime.strptime(schedule_end[6], self.time_formats['long']))
+        free_practices_start = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_start[:3]]
+        free_practices_end = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_end[:3]]
+        qualifyings_start = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_start[3:6]]
+        qualifyings_end = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_end[3:6]]
+        race_start = Conv.to_local_timzone(datetime.strptime(schedule_start[6], Get.time_formats['long']))
+        race_end = Conv.to_local_timzone(datetime.strptime(schedule_end[6], Get.time_formats['long']))
 
         race_starts_in = str(race_start - Conv.to_local_timzone(datetime.utcnow())).split('.')[0]
         track_info = [d.get_text() for d in coming_up_div.select("ul li")][2].split(': ')[1]
 
         # getting data from api
-        json_file = requests.get(f"{self.__url}/current.json").json()
+        json_file = requests.get(f"{Get.__url}/current.json").json()
         races_json = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
         race = {}
         for i, _race in enumerate(races_json):
-            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < current_date:
+            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), Get.time_formats['combined']) < current_date:
                 if _race['Circuit']['Location']['country'] == "UAE":
                     return "End of session"
                 else:
                     race = races_json[i+1]
 
         country = race['Circuit']['Location']['country']
-        date = datetime.strptime(race['date'], self.time_formats['date']).strftime(self.time_formats['show'])
+        date = datetime.strptime(race['date'], Get.time_formats['date']).strftime(Get.time_formats['show'])
         circuit_name = race['Circuit']['circuitName']
 
         race_info = f"Country: {country}\n"
         race_info += f"Circuit: {circuit_name} ({track_info})\n"
-        
+
         race_info += f"Date: {date} ({race_starts_in})\n\n"
         race_info += "Schedule:\n"
 
         table = []
 
         for i in range(3):
-            table.append([f"FP{i+1}", f"{free_practices_start[i].strftime(show_format_0)}", f"{free_practices_start[i].strftime(show_format_1)}", f"{free_practices_end[i].strftime(show_format_1)}"])
-            
+            table.append([f"FP{i+1}", f"{free_practices_start[i].strftime(show_format_0)}",
+                          f"{free_practices_start[i].strftime(show_format_1)}", f"{free_practices_end[i].strftime(show_format_1)}"])
+
         table.append(["", "", "", ""])
 
         for i in range(3):
-            table.append([f"Q{i+1}", f"{qualifyings_start[i].strftime(show_format_0)}", f"{qualifyings_start[i].strftime(show_format_1)}", f"{qualifyings_end[i].strftime(show_format_1)}"])
+            table.append([f"Q{i+1}", f"{qualifyings_start[i].strftime(show_format_0)}",
+                          f"{qualifyings_start[i].strftime(show_format_1)}", f"{qualifyings_end[i].strftime(show_format_1)}"])
 
         table.append(["", "", "", ""])
-        table.append(["Race", f"{race_start.strftime(show_format_0)}", f"{race_start.strftime(show_format_1)}", f"{race_end.strftime(show_format_1)}"])
+        table.append(["Race", f"{race_start.strftime(show_format_0)}",
+                      f"{race_start.strftime(show_format_1)}", f"{race_end.strftime(show_format_1)}"])
 
-        race_info += tabulate(table, headers=["", "Date", "Starts", "Ends"], tablefmt='simple', stralign="center")
+        race_info += tabulate(table, headers=["", "Date", "Starts",
+                                              "Ends"], tablefmt='simple', stralign="center")
 
         return race_info
 
-    def NextWeek(self) -> str:
-        'Returns a string created by "tabulate"'
+    def NextWeek() -> str:
+        'Returns the race weekend after the upcoming one'
 
         current_date = datetime.now()
 
-        json_file = requests.get(f"{self.__url}/current.json").json()
+        json_file = requests.get(f"{Get.__url}/current.json").json()
         races_json = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
         race = {}
         for i, _race in enumerate(races_json):
-            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), self.time_formats['combined']) < current_date:
+            if datetime.strptime(f"{_race['date']} {_race['time']}".replace('Z', ''), Get.time_formats['combined']) < current_date:
                 if _race['Circuit']['Location']['country'] == "UAE":
                     return "End of session"
                 else:
                     race = races_json[i + 2]
 
         country = race['Circuit']['Location']['country']
-        date = datetime.strptime(race['date'], self.time_formats['date']).strftime(self.time_formats['show'])
+        date = datetime.strptime(race['date'], Get.time_formats['date']).strftime(Get.time_formats['show'])
         circuit_name = race['Circuit']['circuitName']
 
-        return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country",f"{country}"], tablefmt='plain')
+        return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country", f"{country}"], tablefmt='plain')
 
-    def LastQualifyingResults(self) -> tuple:
-        'Returns the place where the race qualifying was hosted and the data.'
+    def LastQualifyingResults() -> tuple:
+        'Returns the place where the last qualifying was hosted and the data.'
 
-        json_requests = requests.get(f"{self.__url}/current/last/qualifying.json").json()
+        json_requests = requests.get(f"{Get.__url}/current/last/qualifying.json").json()
         json_file = json2obj(json_requests)
 
         results = json_file["MRData"]['RaceTable']['Races'][0]['QualifyingResults']
@@ -120,10 +127,10 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
-    def LastRaceResults(self) -> tuple:
-        'Returns the place where the race was hosted and the data.'
+    def LastRaceResults() -> tuple:
+        'Returns the place where the last race was hosted and the data.'
 
-        json_requests = requests.get(f"{self.__url}/current/last/results.json").json()
+        json_requests = requests.get(f"{Get.__url}/current/last/results.json").json()
         json_file = json2obj(json_requests)
 
         results = json_file["MRData"]['RaceTable']['Races'][0]['Results']
@@ -144,12 +151,13 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "FL", "Grid Pos", "Status"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
-    def DriverStandings(self, year="current") -> str:
-        'Returns a string created by "tabulate"'
+    def DriverStandings(year="current") -> str:
+        'Returns a tabulated str'
 
-        json_file = requests.get(f"{self.__url}/{year}/driverStandings.json").json()
+        json_file = requests.get(f"{Get.__url}/{year}/driverStandings.json").json()
 
-        _driver_standings = json2obj(json_file)["MRData"]['StandingsTable']['StandingsLists'][0]['DriverStandings']
+        _driver_standings = json2obj(
+            json_file)["MRData"]['StandingsTable']['StandingsLists'][0]['DriverStandings']
 
         table = []
         for pos, ds in enumerate(_driver_standings, 1):
@@ -159,10 +167,10 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
-    def ConstructorStandings(self, year="current") -> str:
-        'Returns a string created by "tabulate"'
+    def ConstructorStandings(year="current") -> str:
+        'Returns a tabulated str'
 
-        json_file = requests.get(f"{self.__url}/{year}/constructorStandings.json").json()
+        json_file = requests.get(f"{Get.__url}/{year}/constructorStandings.json").json()
 
         _constructors_standings = json2obj(json_file)["MRData"]['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
 
@@ -174,10 +182,10 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
-    def Calendar(self, year="current") -> str:
-        'Returns a string created by "tabulate"'
+    def Calendar(year="current") -> str:
+        'Returns a tabulated str'
 
-        json_file = requests.get(f"{self.__url}/{year}.json").json()
+        json_file = requests.get(f"{Get.__url}/{year}.json").json()
 
         races = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
@@ -185,13 +193,16 @@ class Get:
         for race in races:
             country = race['Circuit']['Location']['country']
             circuit_name = race['Circuit']['circuitName']
-            date = datetime.strptime(race['date'], self.time_formats['date']).strftime(self.time_formats['show'])
+            date = datetime.strptime(race['date'], Get.time_formats['date']).strftime(
+                Get.time_formats['show'])
 
-            box = "■" if datetime.strptime(f"{race['date']} {race['time']}".replace('Z', ''), self.time_formats['combined']) < datetime.now() else " "
+            box = "■" if datetime.strptime(f"{race['date']} {race['time']}".replace(
+                'Z', ''), Get.time_formats['combined']) < datetime.now() else " "
 
             table.append([f"{country}", f"{circuit_name}", f"{date}", f"{box}"])
 
         return tabulate(table, headers=["Country", "Circuit", "Date", " "], tablefmt='orgtbl', stralign="center")
 
-def json2obj(json_file): 
+
+def json2obj(json_file):
     return json.loads(json.dumps(json_file))

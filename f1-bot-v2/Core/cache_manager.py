@@ -11,6 +11,7 @@ class Cache:
         self.data = data
 
     def save(self):
+        'Saves self'
         if not os.path.exists('./cache'):
             os.mkdir("cache")
         Conv.obj_to_json(self, f"./cache/{self.type}.json")
@@ -21,10 +22,12 @@ class CacheManager:
 
     @staticmethod
     def load(type:str) -> Cache:
+        'Loads json as Cache obj'
         return Conv.json_to_obj(f"./cache/{type}.json")
 
     @staticmethod
     def valid_cache_exists(type:str) -> bool:
+        'Checks whether the json file exists'
         if os.path.exists(f"./cache/{type}.json"):
             if datetime.strptime(CacheManager.load(type).date, "%Y-%m-%d %H:%M:%S.%f") + timedelta(seconds=CacheManager.time_delta) > datetime.now():
                 return True
