@@ -14,10 +14,6 @@ class Get:
     time_formats = {'date': "%Y-%m-%d", 'time': "%H:%M:%S", 'combined': "%Y-%m-%d %H:%M:%S", 'show': "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
     __url = r"http://ergast.com/api/f1"
 
-    #def __init__(self):
-    #    self.time_formats = {'date': "%Y-%m-%d", 'time': "%H:%M:%S", 'combined': "%Y-%m-%d %H:%M:%S", 'show': "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
-    #    self.__url = r"http://ergast.com/api/f1"
-
     def Upcoming() -> str:
         'Returns the next race weekend'
         show_format_0 = "%a %d %b"

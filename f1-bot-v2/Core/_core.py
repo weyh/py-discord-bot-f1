@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-import sys, os, platform
+import sys, os, platform, requests
 from colorama import init, Fore, Back, Style
 from optparse import OptionParser
 
 init(autoreset=True)
 
-def IsArchitecture64bit():
+def is_architecture_64bit() -> bool:
     return sys.maxsize > 2**32
 
-def Architecture():
+def architecture() -> str:
     return platform.uname().machine
+
+def is_site_up(url = 'https://www.autosport.com/f1') -> bool:
+    return requests.head(url).status_code == 200
 
 class Console:
     debug = False

@@ -3,7 +3,7 @@ import json, pytz
 from tzlocal import get_localzone
 from datetime import datetime, timezone
 
-def strtbool(string:str):
+def strtbool(string:str) -> bool:
     'Converts str to bool'
     return string.lower() in ("true", "t")
 

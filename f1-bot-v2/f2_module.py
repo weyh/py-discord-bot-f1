@@ -13,7 +13,7 @@ from datetime import datetime
 from pytz import timezone
 from tabulate import tabulate
 
-from Core import Console, Cache, CacheManager
+from Core import *
 
 __addPath = True
 
@@ -53,7 +53,7 @@ def upcoming(USER_CFG):
         Console.log("f2_upcoming", "From cache.")
         return CacheManager.load("f2_upcoming").data
 
-    race_info = "COMING UP:\n"
+    race_info = "Coming Up:\n"
     if is_site_up("http://www.fiaformula2.com"):
         global __addPath
 
@@ -155,7 +155,7 @@ def following_week():
         Console.log("f2_following_week", "From cache.")
         return CacheManager.load("f2_following_week").data
     
-    if is_site_up():
+    if is_site_up("https://www.autosport.com/f2"):
         page = requests.get('https://www.autosport.com/f2/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
         calendar = soup.find('div', class_='columnsContainer').find('div', 'leftColumn').select("table tbody tr td")
@@ -191,7 +191,7 @@ def calendar():
         Console.log("f2_calendar", "From cache.")
         return f"Calendar: ```{CacheManager.load('f2_calendar').data}```"
     
-    if is_site_up():
+    if is_site_up("https://www.autosport.com/f2"):
         page = requests.get('https://www.autosport.com/f2/calendar')
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -230,7 +230,7 @@ def driver_standings():
         Console.log("f2_driver_standings", "From cache.")
         return f"Driver Standings: ```{CacheManager.load('f2_driver_standings').data}```"
     
-    if is_site_up():
+    if is_site_up("https://www.autosport.com/f2"):
         page = requests.get('https://www.autosport.com/f2/standings')
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -270,7 +270,7 @@ def last_top10():
         Console.log("f2_last_top10", "From cache.")
         return f"Last week's top 10: ```{CacheManager.load('f2_last_top10').data}```"
     
-    if is_site_up():
+    if is_site_up("https://www.autosport.com/f2"):
         page = requests.get('https://www.autosport.com/f2')
         soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -301,7 +301,7 @@ def last_top10():
 def news():
     news = []
 
-    if is_site_up():
+    if is_site_up("https://www.autosport.com/f2"):
         page = requests.get('https://www.autosport.com/f2')
         soup = BeautifulSoup(page.content, 'html.parser')
         news_soup = list(soup.find('div', class_='columnsContainer').find('div', 'leftColumn').find("div", class_="row small-up-2 medium-up-3").select("div div .newsitem"))[:3]
@@ -328,9 +328,6 @@ def help(prefix):
     for e in HELP_LIST:
         e[1] = e[1].replace("|prefix|", prefix)
     return "Help: ```" + tabulate(HELP_LIST, headers=[" ", " "], stralign="left", tablefmt='plain') + "```"
-
-def is_site_up(url = "https://www.autosport.com/f2"):
-    return requests.head(url).status_code == 200
 
 def __days_or_day_help(s):
     if int(s) > 1:

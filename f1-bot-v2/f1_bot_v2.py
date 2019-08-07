@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import requests, time
-import discord
+import requests, time, discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -60,12 +59,7 @@ async def upcoming(ctx):
         Console.log("upcoming", "From cache.")
         race_info = CacheManager.load("upcoming").data
     else:
-        race_info = "Coming Up:\n"
-        race_info += "```json\n"
-
-        race_info += EDAW.Get.Upcoming()
-
-        race_info += "```"
+        race_info = f"Coming Up:\n```json\n{EDAW.Get.Upcoming()}```"
         
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "upcoming", race_info)
@@ -87,12 +81,7 @@ async def following_week(ctx):
         Console.log("following_week", "From cache.")
         race_info = CacheManager.load("following_week").data
     else:
-        race_info = "Following Week:\n"
-        race_info += "```json\n"
-
-        race_info += EDAW.Get.NextWeek()
-
-        race_info += "```"
+        race_info = f"Following Week:\n```json\n{EDAW.Get.NextWeek()}```"
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "following_week", race_info)
@@ -120,7 +109,7 @@ async def driver_standings(ctx):
             c.save()
 
     Console.log("driver_standings", ds)
-    await send_msg(ctx, "Driver Standings:\n```" + ds + "```")
+    await send_msg(ctx, f"Driver Standings:\n```{ds}```")
 
     Console.warning("SYS (driver_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -142,7 +131,7 @@ async def constructors_standings(ctx):
             c.save()
 
     Console.log("constructors_standings", cs)
-    await send_msg(ctx, "Constructors Standings:\n```" + cs + "```")
+    await send_msg(ctx, f"Constructors Standings:\n```{cs}```")
 
     Console.warning("SYS (constructors_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -164,7 +153,7 @@ async def calendar(ctx):
             c.save()
 
     Console.log("calendar", _calendar)
-    await send_msg(ctx, "Calendar:\n```" + _calendar + "```")
+    await send_msg(ctx, f"Calendar:\n```{_calendar}```")
 
     Console.warning("SYS (calendar)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -177,16 +166,16 @@ async def last_race_results(ctx):
 
     if CacheManager.valid_cache_exists("last_race_results"):
         Console.log("last_race_results", "From cache.")
-        lrr = CacheManager.load("last_race_results").data
+        lrr = CacheManager.load("last_race_results").data.split('~$~')
     else:
-        lrr = EDAW.Get.LastRaceResults()[1]
+        lrr = EDAW.Get.LastRaceResults()
 
         if CacheManager.cache_enabled:
-            c = Cache(str(datetime.now()), "last_race_results", lrr)
+            c = Cache(str(datetime.now()), "last_race_results", '~$~'.join(i for i in lrr))
             c.save()
 
-    Console.log("last_race_results", lrr)
-    await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```" + lrr + "```")
+    Console.log("last_race_results", lrr[1])
+    await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```{lrr[1]}```")
 
     Console.warning("SYS (last_race_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -199,16 +188,16 @@ async def last_qualifying_results(ctx):
 
     if CacheManager.valid_cache_exists("last_qualifying_results"):
         Console.log("last_qualifying_results", "From cache.")
-        lqr = CacheManager.load("last_qualifying_results").data
+        lqr = CacheManager.load("last_qualifying_results").data.split('~$~')
     else:
-        lqr = EDAW.Get.LastQualifyingResults()[1]
+        lqr = EDAW.Get.LastQualifyingResults()
 
         if CacheManager.cache_enabled:
-            c = Cache(str(datetime.now()), "last_qualifying_results", lqr)
+            c = Cache(str(datetime.now()), "last_qualifying_results", '~$~'.join(i for i in lqr))
             c.save()
 
-    Console.log("last_qualifying_results", lqr)
-    await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```" + lqr + "```")
+    Console.log("last_qualifying_results", lqr[1])
+    await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```{lqr[1]}```")
 
     Console.warning("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -219,7 +208,7 @@ async def news(ctx):
 
     sw = Stopwatch()
     news = []
-
+    
     if is_site_up():
         page = requests.get('https://www.autosport.com/f1')
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -317,7 +306,7 @@ async def help(ctx):
     Console.warning(f"user: {ctx.author}", "Started help")
 
     sw = Stopwatch()
-    await ctx.channel.send("Help: ```" + tabulate(HELP_LIST, headers=[" ", " "], stralign="left", tablefmt='plain') + "```")
+    await ctx.channel.send(f"Help: ```{tabulate(HELP_LIST, headers=[' ', ' '], stralign='left', tablefmt='plain')}```")
 
     Console.warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
@@ -343,8 +332,6 @@ async def send_embed_msg(ctx, msg):
 async def send_msg(ctx, msg):
     await ctx.channel.send(msg)
 
-is_site_up = lambda: requests.head('https://www.autosport.com/f1').status_code == 200
-
 #region Logs
 Console.warning("Boot", f"Version: {VERSION}")
 Console.log("Boot", f"Token found: {len(USER_CFG.token) != 0}")
@@ -354,7 +341,6 @@ Console.log("Boot", f"Cache: {USER_CFG.cache}")
 Console.log("Boot", f"Cache time delta: {USER_CFG.cache_time_delta} sec")
 Console.log("Boot", f"Browser path: {USER_CFG.browser_path}")
 Console.log("Boot", f"Time zone: {time.tzname[0]}")
-Console.log("Boot", f"Site up: {is_site_up()}")
 #endregion
 
 client.run(USER_CFG.token)
