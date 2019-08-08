@@ -8,7 +8,7 @@ from stopwatch import Stopwatch
 
 from Core import *
 
-VERSION = "v2.0.5"
+VERSION = "v2.0.6"
 START_TIME = datetime.now()
 
 #args
@@ -247,9 +247,9 @@ async def _f2_modele(ctx, *, message):
     Console.warning(f"user: {ctx.author}", f"Started f2_modele({message})")
     sw = Stopwatch()
 
-    msg_type, msg = f2_module.resolve(message, USER_CFG)
+    msg = f2_module.resolve(message, USER_CFG)
 
-    if msg_type == "embed":
+    if type(msg) is not str:
         await send_msg(ctx, "News:")
         await send_embed_msg(ctx, msg)
     else:
@@ -267,8 +267,8 @@ async def uptime(ctx):
 
     timedelta = datetime.now() - START_TIME
 
-    Console.log("uptime", "Uptime: " + str(round(timedelta.total_seconds())) + "s")
-    await send_msg(ctx, "Uptime: " + str(round(timedelta.total_seconds())) + "s")
+    Console.log("uptime", f"Uptime: {timedelta}")
+    await send_msg(ctx, f"Uptime: ```json\n{timedelta}```")
 
     Console.warning("SYS (uptime)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()

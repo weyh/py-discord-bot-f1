@@ -70,7 +70,7 @@ To access the command list you can always use "--help" in the discord chat.
 | :--- | :--- |
 | Upcoming race weekend | `--f2 upcoming`, `--f2 coming_up` |
 | The race weekend after the upcoming one | `--f2 following_week`, `--f2 fw` |
-| Top 10 from last race | `--f2 last_top10` |
+| Top 10 from last race | `--f2 last_top10`, `--f2 lt10` |
 | Current Driver Standings | `--f2 driver_standings`, `--f2 ds` |
 | Championship Calendar | `--f2 calendar` |
 | News | `--f2 news` |

@@ -13,7 +13,7 @@ from datetime import datetime
 from pytz import timezone
 from tabulate import tabulate
 
-from Core import *
+from Core import Console, Cache, CacheManager, is_site_up
 
 __addPath = True
 
@@ -27,22 +27,22 @@ HELP_LIST = [["Upcoming race weekend:", "|prefix|f2 upcoming\n|prefix|f2 coming_
 
 def resolve(msg, USER_CFG):
     if msg == "upcoming" or msg == "coming_up":
-        return "str", upcoming(USER_CFG)
+        return upcoming(USER_CFG)
     elif msg == "following_week" or msg == "fw":
-        return "str", following_week()
-    elif msg == "last_top10":
-        return "str", last_top10()
+        return following_week()
+    elif msg == "last_top10" or msg == "lt10":
+        return last_top10()
     elif msg == "driver_standings" or msg == "ds":
-        return "str", driver_standings()
+        return driver_standings()
     elif msg == "calendar":
-        return "str", calendar()
+        return calendar()
     elif msg == "news":
-        return "embed", news()
+        return news()
     elif msg == "help":
-        return "str", help(USER_CFG.prefix)
+        return help(USER_CFG.prefix)
 
     Console.error("f2_modele(resolve)", f"Incorrect command \"{msg}\"")
-    return "str", f"Incorrect command \"{msg}\""
+    return f"Incorrect command \"{msg}\""
 
 def upcoming(USER_CFG):
     if(USER_CFG.browser_path == "undefined"):
@@ -53,7 +53,6 @@ def upcoming(USER_CFG):
         Console.log("f2_upcoming", "From cache.")
         return CacheManager.load("f2_upcoming").data
 
-    race_info = "Coming Up:\n"
     if is_site_up("http://www.fiaformula2.com"):
         global __addPath
 
@@ -105,22 +104,22 @@ def upcoming(USER_CFG):
             m = _upcoming.find('div', id='countdownClock').find('span', id='sec').get_text()
             race_starts_in = f"{d} {__days_or_day_help(d)}, {h}:{s}:{m}"
 
-            free_practices = _upcoming.find('div', id='session-0').find('span', class_="gmttime").get_text()
-            qualifying = _upcoming.find('div', id='session-1').find('span', class_="gmttime").get_text()
-            race_1 = _upcoming.find('div', id='session-2').find('span', class_="gmttime").get_text()
-            race_2 = _upcoming.find('div', id='session-3').find('span', class_="gmttime").get_text()
+            free_practices = _upcoming.find('div', id='session-0').find('span', class_="gmttime").get_text().split(',')
+            qualifying = _upcoming.find('div', id='session-1').find('span', class_="gmttime").get_text().split(',')
+            race_1 = _upcoming.find('div', id='session-2').find('span', class_="gmttime").get_text().split(',')
+            race_2 = _upcoming.find('div', id='session-3').find('span', class_="gmttime").get_text().split(',')
 
-            date = race_1[3:10]
+            table = [["Practice", free_practices[0], free_practices[1]], ["Qualifying", qualifying[0], qualifying[1]], 
+                     ["Race 1", race_1[0], race_1[1]], ["Race 2", race_2[0], race_2[1]]]
+            date = race_1[0]
 
-            race_info += str(f"{location} / {date}\n" + 
-                        f"Race starts in: {race_starts_in}\n" +
-                        f"Circuit: {circuit}\n\n" +
-                        "SCHEDULE:\n" +
-                        f"Practice: {free_practices}\n" +
-                        f"Qualifying: {qualifying}\n" +
-                        f"Race 1: {free_practices}\n" +
-                        f"Race 2: {free_practices}"
-                        )
+            race_info = f"Coming Up:\n```json\n"
+            race_info += f"Country: {location}\n"
+            race_info += f"Circuit: {circuit}\n"
+            race_info += f"Date: {date}\n\n"
+            race_info += f"Schedule:\n"
+            race_info += tabulate(table, headers=["", "Date", "Starts"], tablefmt='simple', stralign="center")
+            race_info += "```"
         
             Console.log("f2_upcoming", race_info)
 
@@ -163,7 +162,7 @@ def following_week():
         i = 3
         while i < len(calendar):
             if len(calendar[i].contents) == 0:
-                n_race = [r.get_text() for r in calendar[i + 1:i + 4]]
+                n_race = [r.get_text() for r in calendar[i + 5:i + 8]]
                 race_info = tabulate([["Circuit", f"{n_race[1]}"], ["Date",f"{n_race[2]}"]], headers=["Race",f"{n_race[0]}"], tablefmt='plain')
                 break
             else:
@@ -264,24 +263,23 @@ def driver_standings():
     return f"Driver Standings: ```{r_text}```"
 
 def last_top10():
-    r_text = ""
-
     if CacheManager.valid_cache_exists("f2_last_top10"):
         Console.log("f2_last_top10", "From cache.")
-        return f"Last week's top 10: ```{CacheManager.load('f2_last_top10').data}```"
+        return CacheManager.load('f2_last_top10').data
     
     if is_site_up("https://www.autosport.com/f2"):
         page = requests.get('https://www.autosport.com/f2')
         soup = BeautifulSoup(page.content, 'html.parser')
 
+        loc = soup.find_all('div', class_='stats')[0].select("span.headerbar.smaller")[0].get_text().split('/')[0]
         drivers = [d.get_text() for d in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(2) a")]
-        teams = [t.get_text() for t in soup.find_all('div', class_='stats')[0].select("table tbody tr td:nth-child(3)")]
 
         table = []
-        for i, (driver, team) in enumerate(zip(drivers, teams), start=1):
+        for i, driver, in enumerate(drivers, start=1):
             table.append([f"{i}", f"{driver}"])
 
-        r_text += tabulate(table, headers=["Pos", "Driver"], tablefmt='orgtbl', numalign="right", stralign="center")
+        data = tabulate(table, headers=["Pos", "Driver"], tablefmt='orgtbl', numalign="right", stralign="center")
+        r_text = f"Last week's top 10: {loc}\n```{data}```"
 
         Console.log("f2_last_top10", r_text)
         if CacheManager.cache_enabled:
@@ -296,12 +294,12 @@ def last_top10():
         else:
             r_text = "Error: Unable to reach http://www.fiaformula2.com"
 
-    return "Last week's top 10: ```" + r_text + "```"
+    return r_text
 
 def news():
-    news = []
-
     if is_site_up("https://www.autosport.com/f2"):
+        news = []
+
         page = requests.get('https://www.autosport.com/f2')
         soup = BeautifulSoup(page.content, 'html.parser')
         news_soup = list(soup.find('div', class_='columnsContainer').find('div', 'leftColumn').find("div", class_="row small-up-2 medium-up-3").select("div div .newsitem"))[:3]
