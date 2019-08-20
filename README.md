@@ -34,6 +34,7 @@ With command line arguments you can modify the settings of usr.cfg to that speci
 | Bot's token| `-t`, `--token` |
 | Prefix | `-p`, `--prefix` |
 | Debug | `-d`, `--debug` |
+| Timestamp | `-T`, `--timestamp` |
 | Cache| `-c`, `--cache` |
 | Caching time delta \* | `-C`, `--cache_time_delta` |
 | Path of your preferred browser| `-b`, `--browser_path` |

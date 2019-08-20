@@ -19,7 +19,7 @@ __addPath = True
 
 HELP_LIST = [["Upcoming race weekend:", "|prefix|f2 upcoming\n|prefix|f2 coming_up"],
                 ["The race weekend after the upcoming one:", "|prefix|f2 following_week \n|prefix|f2 fw"],
-                ["Top 10 from last race:", "|prefix|f2 last_top10"],
+                ["Top 10 from last race:", "|prefix|f2 last_top10, \n|prefix|f2 lt10"],
                 ["Current Driver Standings:", "|prefix|f2 driver_standings \n|prefix|f2 ds"],
                 ["Championship Calendar:", "|prefix|f2 calendar"],
                 ["News:", "|prefix|f2 news"],

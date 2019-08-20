@@ -5,10 +5,11 @@ from Core import converter as Conv
 from colorama import Fore
 
 class UserConfig:
-    def __init__(self, token:str, prefix:str, debug:bool, cache:bool, cache_time_delta:float, browser_path:str):
+    def __init__(self, token:str, prefix:str, debug:bool, timestamp:bool, cache:bool, cache_time_delta:float, browser_path:str):
         self.token = token
         self.prefix = prefix
         self.debug = debug if type(debug) == bool else Conv.strtbool(debug)
+        self.timestamp = timestamp if type(timestamp) == bool else Conv.strtbool(timestamp)
         self.cache = cache if type(cache) == bool else Conv.strtbool(cache)
         self.cache_time_delta = float(cache_time_delta)
         self.browser_path = browser_path
@@ -60,6 +61,7 @@ class UserConfig:
 
             prefix = input("Prefix (default: '--'): ")
             debug = input("Debug (True/False, default: False): ")
+            timestamp = input("Timestamp for console logs (True/False, default: False): ")
             cache = input("Caching (True/False, default: True): ")
             cache_td = input("Caching time delta (default: 1800 sec): ")
             browser_path = input("Browser's path (**): ")
@@ -67,6 +69,7 @@ class UserConfig:
             # var validation
             prefix = prefix if prefix != "" else "--"
             debug = debug if debug != "" else False
+            timestamp = timestamp if timestamp != "" else False
             cache = cache if cache != "" else True
             cache_td = cache_td if cache_td != "" else 1800
             browser_path = browser_path if browser_path != "" else "undefined"
@@ -76,6 +79,7 @@ class UserConfig:
                   f"token={token}\n"+
                   f"prefix={prefix}\n"+
                   f"debug={debug}\n"+
+                  f"timestamp={timestamp}\n"+
                   f"caching={cache}\n"+
                   f"cache_time_delta={cache_td}\n"+
                   f"browser_path={browser_path}\n"+
@@ -84,7 +88,7 @@ class UserConfig:
             print("")
             done = Console.yes_or_no("Save and continue (Y/n)? ")        
 
-        usr_c = UserConfig(token, prefix, debug, cache, cache_td, browser_path)
+        usr_c = UserConfig(token, prefix, debug, timestamp, cache, cache_td, browser_path)
         usr_c.save()
         print("DONE!")
         return usr_c

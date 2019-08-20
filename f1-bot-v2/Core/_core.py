@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys, os, platform, requests
+from datetime import datetime
 from colorama import init, Fore, Back, Style
 from optparse import OptionParser
 
@@ -16,6 +17,7 @@ def is_site_up(url = 'https://www.autosport.com/f1') -> bool:
 
 class Console:
     debug = False
+    timestamp = False
 
     @staticmethod
     def clear():
@@ -36,15 +38,18 @@ class Console:
     @staticmethod
     def log(src:str, msg, force_debug = False):
         if force_debug or Console.debug:
-            print(Fore.LIGHTWHITE_EX + "> " + src + ": " + str(msg))
+            _tmstamp = f"({datetime.now().strftime('%y/%m/%d %H:%M:%S.%f')})" if Console.timestamp else ""
+            print(Fore.LIGHTWHITE_EX + "> " + src + f"{_tmstamp}: " + str(msg))
 
     @staticmethod
     def warning(src:str, msg):
-        print(Fore.LIGHTYELLOW_EX + "> " + src + ": " + str(msg))
+        _tmstamp = f"({datetime.now().strftime('%y/%m/%d %H:%M:%S.%f')})" if Console.timestamp else ""
+        print(Fore.LIGHTYELLOW_EX + "> " + src + f"{_tmstamp}: " + str(msg))
 
     @staticmethod
     def error(src:str, msg):
-        print(Fore.LIGHTRED_EX + "> " + src + ": " + str(msg))
+        _tmstamp = f"({datetime.now().strftime('%y/%m/%d %H:%M:%S.%f')})" if Console.timestamp else ""
+        print(Fore.LIGHTRED_EX + "> " + src + f"{_tmstamp}: " + str(msg))
 
     @staticmethod
     def printc(text, color = ""):
@@ -95,9 +100,10 @@ class Start:
 
         parser = OptionParser(version = version)
         parser.add_option("-t", "--token", dest="token", help="Discord bot token", metavar="TOKEN")
-
         parser.add_option("-p", "--prefix", dest="prefix", help="Discord chat prefix to access the bot (default: '--')", metavar="PREFIX")
+
         parser.add_option("-d", "--debug", dest="debug", action="store_true", help="Turn debug mode on/off (default: False)", metavar="True/False")
+        parser.add_option("-T", "--timestamp", dest="timestamp", action="store_true", help="Turn timestamp on/off (default: False)", metavar="True/False")
 
         parser.add_option("-c", "--cache", dest="cache", help="Turn caching on/off (default: True)", metavar="True/False")
         parser.add_option("-C", "--cache_time_delta", dest="cache_time_delta", help="The time while the cached data is valid (default: 1800 sec)", metavar="CACHE_TIME_DELTA")

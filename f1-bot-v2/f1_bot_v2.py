@@ -8,7 +8,7 @@ from stopwatch import Stopwatch
 
 from Core import *
 
-VERSION = "v2.0.6"
+VERSION = "v2.0.7"
 START_TIME = datetime.now()
 
 #args
@@ -23,6 +23,7 @@ else:
 USER_CFG.update(args)
 
 Console.debug = USER_CFG.debug
+Console.timestamp = USER_CFG.timestamp
 CacheManager.cache_enabled = USER_CFG.cache
 CacheManager.time_delta = USER_CFG.cache_time_delta
 HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.prefix}upcoming\n{USER_CFG.prefix}coming_up"],
