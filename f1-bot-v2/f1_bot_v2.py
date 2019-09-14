@@ -8,7 +8,7 @@ from stopwatch import Stopwatch
 
 from Core import *
 
-VERSION = "v2.0.7"
+VERSION = "v2.1.0"
 START_TIME = datetime.now()
 
 #args
@@ -250,10 +250,10 @@ async def _f2_modele(ctx, *, message):
 
     msg = f2_module.resolve(message, USER_CFG)
 
-    if type(msg) is not str:
+    if type(msg) is not str and msg != None:
         await send_msg(ctx, "News:")
         await send_embed_msg(ctx, msg)
-    else:
+    elif msg != None:
         await send_msg(ctx, msg)
 
     Console.warning(f"SYS f2_modele({message})", "Total time taken: " + str(round(sw.duration*1000)) + " ms")

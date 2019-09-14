@@ -42,7 +42,7 @@ def resolve(msg, USER_CFG):
         return help(USER_CFG.prefix)
 
     Console.error("f2_modele(resolve)", f"Incorrect command \"{msg}\"")
-    return f"Incorrect command \"{msg}\""
+    return None
 
 def upcoming(USER_CFG):
     if(USER_CFG.browser_path == "undefined"):
