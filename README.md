@@ -1,4 +1,4 @@
-﻿![bot logo](img/logo.png)
+﻿﻿![bot logo](img/logo.png)
 
 # Discord Formula 1, Formula 2 Bot
 

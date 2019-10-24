@@ -60,7 +60,6 @@ class Console:
         else:
             print(color + str(text))
 
-
     @staticmethod
     def yes_or_no(question = "", c_color = ""):
         'Yes or no question'
@@ -99,6 +98,7 @@ class Start:
             return
 
         parser = OptionParser(version = version)
+        
         parser.add_option("-t", "--token", dest="token", help="Discord bot token", metavar="TOKEN")
         parser.add_option("-p", "--prefix", dest="prefix", help="Discord chat prefix to access the bot (default: '--')", metavar="PREFIX")
 
