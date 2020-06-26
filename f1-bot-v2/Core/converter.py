@@ -8,7 +8,6 @@ def strtbool(string:str) -> bool:
     return string.lower() in ("true", "t")
 
 #Time
-
 def to_local_timzone(dt):
     'Converts time to local time'
     return dt.astimezone(get_localzone())
@@ -32,14 +31,14 @@ def __dict_to_obj(our_dict):
     if "__class__" in our_dict:
         class_name = our_dict.pop("__class__")
         module_name = our_dict.pop("__module__")
-        
+
         module = __import__(module_name)
         class_ = getattr(module, class_name)
         obj = class_(**our_dict)
     else:
         obj = our_dict
     return obj
-    
+
 def json_to_obj(filename:str) -> object:
     with open(filename, 'r') as json_data:
         return json.load(json_data, object_hook=__dict_to_obj)

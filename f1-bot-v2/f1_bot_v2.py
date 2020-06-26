@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+if __name__ != "__main__":
+    quit()
+
 import requests, time, discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
@@ -8,7 +11,7 @@ from stopwatch import Stopwatch
 
 from Core import *
 
-VERSION = "v2.1.0"
+VERSION = "v2.1.1"
 START_TIME = datetime.now()
 
 #args
@@ -35,7 +38,7 @@ HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.prefix}upcoming\n{USER_CFG.p
                 ["Last Qualifying Results:", f"{USER_CFG.prefix}last_qualifying_results\n{USER_CFG.prefix}last_qualifying\n{USER_CFG.prefix}lqr"],
                 ["News:", f"{USER_CFG.prefix}news"],
                 ["Clear cache:", f"{USER_CFG.prefix}clear_cache"],
-                ["Clear:", f"{USER_CFG.prefix}clear\n{USER_CFG.prefix}clean\n{USER_CFG.prefix}cls"],                
+                ["Clear:", f"{USER_CFG.prefix}clear\n{USER_CFG.prefix}clean\n{USER_CFG.prefix}cls"],
                 ["Uptime:", f"{USER_CFG.prefix}uptime"],
                 ["Version:", f"{USER_CFG.prefix}version"],
                 ["Help:", f"{USER_CFG.prefix}help"]]
@@ -61,7 +64,7 @@ async def upcoming(ctx):
         race_info = CacheManager.load("upcoming").data
     else:
         race_info = f"Coming Up:\n```json\n{EDAW.Get.Upcoming()}```"
-        
+
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "upcoming", race_info)
             c.save()
@@ -209,7 +212,7 @@ async def news(ctx):
 
     sw = Stopwatch()
     news = []
-    
+
     if is_site_up():
         page = requests.get('https://www.autosport.com/f1')
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -219,7 +222,7 @@ async def news(ctx):
             article_url = n_soup.find("a").get("href")
             article_img = "http://" + n_soup.find("a").find("img").get("data-src")[2:]
             article_title = article_url.split('/')[4].replace('-', ' ').capitalize()
-            article_description = n_soup.find("span", class_="sell").get_text() 
+            article_description = n_soup.find("span", class_="sell").get_text()
 
             embed = discord.Embed(title=article_title, colour=discord.Colour(0xff2800), url=str("https://www.autosport.com"+article_url), description=article_description)
             embed.set_thumbnail(url=article_img)
@@ -235,28 +238,6 @@ async def news(ctx):
     await send_embed_msg(ctx, news)
 
     Console.warning("SYS (news)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
-    sw.reset()
-
-@client.command(aliases=["f2", "formula2"], pass_context=True)
-async def _f2_modele(ctx, *, message):
-    try:
-        import f2_module
-    except ModuleNotFoundError:
-        Console.error(f"SYS", f"f2_module was called but its not installed!")
-        return
-
-    Console.warning(f"user: {ctx.author}", f"Started f2_modele({message})")
-    sw = Stopwatch()
-
-    msg = f2_module.resolve(message, USER_CFG)
-
-    if type(msg) is not str and msg != None:
-        await send_msg(ctx, "News:")
-        await send_embed_msg(ctx, msg)
-    elif msg != None:
-        await send_msg(ctx, msg)
-
-    Console.warning(f"SYS f2_modele({message})", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 @client.command()
@@ -282,7 +263,7 @@ async def clear_cache(ctx):
 
     CacheManager.clear()
     await send_msg(ctx, "Cache cleared!")
-        
+
     Console.warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
@@ -298,7 +279,7 @@ async def clear(ctx):
     for message in messages:
         if message.author.bot or message.content[:len(USER_CFG.prefix)] == USER_CFG.prefix:
             await message.delete()
-        
+
     Console.warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
@@ -340,7 +321,6 @@ Console.log("Boot", f"Prefix: {USER_CFG.prefix}")
 Console.log("Boot", f"Debug: {USER_CFG.debug}")
 Console.log("Boot", f"Cache: {USER_CFG.cache}")
 Console.log("Boot", f"Cache time delta: {USER_CFG.cache_time_delta} sec")
-Console.log("Boot", f"Browser path: {USER_CFG.browser_path}")
 Console.log("Boot", f"Time zone: {time.tzname[0]}")
 #endregion
 

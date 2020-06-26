@@ -1,27 +1,21 @@
-﻿﻿![bot logo](img/logo.png)
+﻿
+﻿![bot logo](img/logo.png)
 
-# Discord Formula 1, Formula 2 Bot
+# Discord Formula 1 Bot
 
-Gives information on upcoming or previous F1, F2 events. 
+Gives information on upcoming or previous F1 events. 
 
 ## Set up
 
-1. Installation:
-	- Download the correct [release](https://github.com/weyh/py-discord-bot-f1/releases/latest) for your computer and unpack it.
-	- If you want to use the f2_module, you need to get a [third party Selenium browser driver](https://www.seleniumhq.org/download/) that matches your browser. *([Geckodriver (v0.17.0 ARM7) for Raspberry Pi 3](https://www.github.com/mozilla/geckodriver/releases/download/v0.17.0/geckodriver-v0.17.0-arm7hf.tar.gz), *Unfortunately "marionette" does not seem to work on the ARM Geckodriver builds, so each time a function (which uses selenium) runs a new instance of the browser will be launched.*) **Tested browsers:** Google Chrome, Mozilla Firefox.*
-		 - On **Windows**, browser driver should be located in the root directory (next to the exe)!
-		 - On **Linux**, browser driver should be copied to `/usr/local/bin`!
-Run: `sudo cp geckodriver /usr/local/bin`
+1. Installation: Download the correct [release](https://github.com/weyh/py-discord-bot-f1/releases/latest) for your computer and unpack it.
 
 2. After downloading the files, you need to create a [new discord application](https://discordapp.com/developers/applications/) and get the bot's token. *([Creating a discord bot & getting a token](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token))*
 
-3. If you have the token, you can start the bot. (On **Windows** simply open the .exe, on **Linux** `./F1Bot_v2` in the cli. [What to do if it's not starting?](#what-to-do-if-its-not-starting)). 
+3. If you have the token, you can start the bot. (On **Windows** simply open the .exe, on **Linux** `./F1Bot_v2` in the cli. [Resolving problems with start.](#resolving-problems-concerning-the-start-of-the-program)). 
 
 4. On the initial start the bot will start the creation process of a new `usr.cfg` file.
-The file contains the following parameters: token\*, prefix (default: "--"), debug (True/False, default: False), cache (default: True), cache_time_delta (default: 30 min), browser_path\*\*
-	- '\*': essential
-	- '\*\*': essential if the f2 module will be used.
-
+The file contains the following parameters: token\*, prefix (default: "--"), debug (True/False, default: False), cache (default: True), cache_time_delta (default: 30 min)
+Parameters marked with '\*' are essential.
 
 ## Command Line Arguments
 
@@ -41,7 +35,7 @@ With command line arguments you can modify the settings of usr.cfg to that speci
 
 \*: The time while the cached data is valid.
 
-Eg.: `F1Bot_v2.exe --prefix=-- -d -C 10`
+E.g: `F1Bot_v2.exe --prefix=-- -d -C 10`
 In this case: **prefix:** "--", **debug:** True, **caching time delta:** 10 sec.
 
 ## Commands
@@ -65,30 +59,16 @@ To access the command list you can always use "--help" in the discord chat.
 | Version | `--version` |
 | Help | `--help` |
 
-**F2 Module Command List:**
-
-| Description | Command |
-| :--- | :--- |
-| Upcoming race weekend | `--f2 upcoming`, `--f2 coming_up` |
-| The race weekend after the upcoming one | `--f2 following_week`, `--f2 fw` |
-| Top 10 from last race | `--f2 last_top10`, `--f2 lt10` |
-| Current Driver Standings | `--f2 driver_standings`, `--f2 ds` |
-| Championship Calendar | `--f2 calendar` |
-| News | `--f2 news` |
-| Help | `--f2 help` |
-
-*Note: You should replace `--` with your prefix.*
-
 ## Troubleshooting
 
 Note: **On Mac** the entire repo is not working, for me at least.
 
-### What to do if it's not starting?
+### Resolving problems concerning the start of the program
 
 Check if you downloaded the right executable.
 
-- **Linux:** The files are built on **[Ubuntu (64bit), Mint (32bit) and Raspbian (ARM)](img/linux.png)**. Because of all the different distros I cannot test on all of them. If it's not working on yours, you can clone the repo and either build it yourself, or just run the .py file. *(From my brief testing with older versions of Ubuntu (16.04 x86/16.10 x64), the problem is the GLIBC version.)*
-- **Windows:** Both files are built in a Win 10  environment. If your are using an older version, there might be some DLLs missing. They are probably [Microsoft Visual C++ 2010 Redistributable Package (x64)](https://www.microsoft.com/en-us/download/details.aspx?id=14632), [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555). If this doesn't fix it, you can clone the repo and try to build it yourself or just run the .py file.
+- **Linux:** The files are built on **[Ubuntu 64bit and Raspberry Pi OS (Raspbian) ARM](img/linux.png)**. *(From my brief testing with older versions of Ubuntu (16.04 x86/16.10 x64), the problem is the GLIBC version.)* You can also try to clone the repo and build it yourself or just run the `f1_bot_v2.py` file. 
+- **Windows:** Both files are built in a Win 10  environment. In case of an older version of windows, it is possible that some dlls are missing. Probably: [Microsoft Visual C++ 2010 Redistributable Package (x64)](https://www.microsoft.com/en-us/download/details.aspx?id=14632), [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555). You can also try to clone the repo and build it yourself or just run the `f1_bot_v2.py` file. 
 
 #### Clone and build (Additional package required: `pyinstaller`):
 ```bash
@@ -125,6 +105,7 @@ python3 f1_bot_v2.py
 - [pyinstaller](https://www.pyinstaller.org)
 
 #### Packages used: [reqs.txt](reqs.txt)
+
 ---
 
 ### License

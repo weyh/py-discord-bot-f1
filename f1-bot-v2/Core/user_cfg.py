@@ -13,11 +13,11 @@ class UserConfig:
         self.cache = cache if type(cache) == bool else Conv.strtbool(cache)
         self.cache_time_delta = float(cache_time_delta)
         self.browser_path = browser_path
-    
+
     def save(self):
         'Saves this user config'
         Conv.obj_to_json(self, "usr.cfg")
-    
+
     def update(self, invar:dict):
         'Updates the user config with args'
         if invar is None:
@@ -49,9 +49,8 @@ class UserConfig:
         while not done:
             Console.clear()
             Console.printc("Fields marked with '*' are essential!\n"+
-                    "Fields marked with '**' are essential for the f2 module only!\n"+
                     "Other fields can be left empty.", Fore.LIGHTRED_EX)
-            
+
             while True:
                 token = input("Token (*): ")
                 if token != "":
@@ -64,7 +63,7 @@ class UserConfig:
             timestamp = input("Timestamp for console logs (True/False, default: False): ")
             cache = input("Caching (True/False, default: True): ")
             cache_td = input("Caching time delta (default: 1800 sec): ")
-            browser_path = input("Browser's path (**): ")
+            browser_path = ""
 
             # var validation
             prefix = prefix if prefix != "" else "--"
@@ -75,18 +74,17 @@ class UserConfig:
             browser_path = browser_path if browser_path != "" else "undefined"
 
             print("-------------------------------------------------------------------\n"+
-                  "Check if all the values are correct!\n"+
+                  "Check if all values are correct!\n"+
                   f"token={token}\n"+
                   f"prefix={prefix}\n"+
                   f"debug={debug}\n"+
                   f"timestamp={timestamp}\n"+
                   f"caching={cache}\n"+
                   f"cache_time_delta={cache_td}\n"+
-                  f"browser_path={browser_path}\n"+
                   "-------------------------------------------------------------------")
-            
+
             print("")
-            done = Console.yes_or_no("Save and continue (Y/n)? ")        
+            done = Console.yes_or_no("Save and continue (Y/n)? ")
 
         usr_c = UserConfig(token, prefix, debug, timestamp, cache, cache_td, browser_path)
         usr_c.save()

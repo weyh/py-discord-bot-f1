@@ -91,14 +91,14 @@ class Start:
         Console.printc(" _                       __       _             __ \n"+
                        "| \ o  _  _  _  __ _|   |_ /|    |_) _ _|_       _)\n"+
                        "|_/ | _> (_ (_) | (_|   |   |    |_)(_) |_   \_//__", Fore.LIGHTCYAN_EX)
-    
+
     @staticmethod
     def load_args(version):
         if len(sys.argv) == 1:
             return
 
         parser = OptionParser(version = version)
-        
+
         parser.add_option("-t", "--token", dest="token", help="Discord bot token", metavar="TOKEN")
         parser.add_option("-p", "--prefix", dest="prefix", help="Discord chat prefix to access the bot (default: '--')", metavar="PREFIX")
 
@@ -107,8 +107,6 @@ class Start:
 
         parser.add_option("-c", "--cache", dest="cache", help="Turn caching on/off (default: True)", metavar="True/False")
         parser.add_option("-C", "--cache_time_delta", dest="cache_time_delta", help="The time while the cached data is valid (default: 1800 sec)", metavar="CACHE_TIME_DELTA")
-
-        parser.add_option("-b", "--browser_path", dest="browser_path", help="Path of your preferred browser", metavar="BROWSER_PATH")
 
         (options, args) = parser.parse_args()
         return vars(options)

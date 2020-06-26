@@ -45,12 +45,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="f1_bot_v2.py" />
-    <Compile Include="f2_module.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Build\build_configurations.txt" />
     <Content Include="Build\file_version_info_template.txt" />
-    <Content Include="geckodriver.exe" />
+    <Content Include="Build\icon.ico" />
     <Content Include="usr.cfg" />
   </ItemGroup>
   <ItemGroup>
