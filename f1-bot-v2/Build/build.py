@@ -26,6 +26,9 @@ def read_version():
 
     return all.split("VERSION")[1].split('"')[1]
 
+if not os.path.exists('./_temp'):
+    os.mkdir("_temp")
+
 os.chdir("..")
 version = read_version()
 
@@ -40,9 +43,6 @@ commands = {
     "Linux": f'pyinstaller f1_bot_v2.py -n "F1Bot_v2" --onefile --workpath="./{dirs["workpath"]}/linux_{architecture}" --distpath="./{dirs["distpath"]}/linux_{architecture}"',
     "Windows": f'pyinstaller f1_bot_v2.py -n "F1Bot_v2" --onefile --workpath="./{dirs["workpath"]}/win_{architecture}" --distpath="./{dirs["distpath"]}/win_{architecture}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
 }
-
-if not os.path.exists('./_temp'):
-    os.mkdir("_temp")
 
 print("---------")
 print("Platrom: " + platform.system() + " " + architecture)
