@@ -1,38 +1,45 @@
 # -*- coding: utf-8 -*-
-import os, shutil
+import os
+import shutil
 from datetime import datetime, timedelta
 from Core import Console
-from Core import converter as Conv
+from Core import converter as Converter
+from dataclasses import dataclass
+from typing import cast
 
+
+@dataclass
 class Cache:
-    def __init__(self, date:str, type:str, data:str):
+    def __init__(self, date: str, type: str, data: str):
         self.date = date
         self.type = type
         self.data = data
 
-    def save(self):
-        'Saves self'
-        if not os.path.exists('./cache'):
-            os.mkdir("cache")
-        Conv.obj_to_json(self, f"./cache/{self.type}.json")
 
 class CacheManager:
     cache_enabled = True
-    time_delta = 1800#sec
+    time_delta = 1800  # sec
 
     @staticmethod
-    def load(type:str) -> Cache:
+    def load(type: str) -> Cache:
         'Loads json as Cache obj'
-        return Conv.json_to_obj(f"./cache/{type}.json")
+        return cast(Cache, Converter.json2obj(f"./cache/{type}.json"))
 
     @staticmethod
-    def valid_cache_exists(type:str) -> bool:
+    def valid_cache_exists(type: str) -> bool:
         'Checks whether the json file exists'
         if os.path.exists(f"./cache/{type}.json"):
             if datetime.strptime(CacheManager.load(type).date, "%Y-%m-%d %H:%M:%S.%f") + timedelta(seconds=CacheManager.time_delta) > datetime.now():
                 return True
 
         return False
+
+    @staticmethod
+    def save(cache_obj: Cache):
+        'Saves self'
+        if not os.path.exists('./cache'):
+            os.mkdir("cache")
+        Converter.obj2json(cache_obj, f"./cache/{cache_obj.type}.json")
 
     @staticmethod
     def clear():
