@@ -1,0 +1,9 @@
+﻿﻿requests
+beautifulsoup4
+bs4
+discord-py
+pytz
+tzlocal
+tabulate
+stopwatch.py
+colorama

@@ -16,7 +16,8 @@ class Get:
     time_formats = {'date': "%Y-%m-%d", 'time': "%H:%M:%S", 'combined': "%Y-%m-%d %H:%M:%S", 'show': "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
     __url = r"http://ergast.com/api/f1"
 
-    def Upcoming(self) -> str:
+    @staticmethod
+    def Upcoming() -> str:
         'Returns the next race weekend'
         show_format_0 = "%a %d %b"
         show_format_1 = "%H:%M"
@@ -83,7 +84,8 @@ class Get:
 
         return race_info
 
-    def NextWeek(self) -> str:
+    @staticmethod
+    def NextWeek() -> str:
         'Returns the race weekend after the upcoming one'
 
         current_date = datetime.now()
@@ -105,7 +107,8 @@ class Get:
 
         return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country", f"{country}"], tablefmt='plain')
 
-    def LastQualifyingResults(self) -> tuple:
+    @staticmethod
+    def LastQualifyingResults() -> tuple:
         'Returns the place where the last qualifying was hosted and the data.'
 
         json_requests = requests.get(f"{Get.__url}/current/last/qualifying.json").json()
@@ -125,7 +128,8 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
-    def LastRaceResults(self) -> tuple:
+    @staticmethod
+    def LastRaceResults() -> tuple:
         'Returns the place where the last race was hosted and the data.'
 
         json_requests = requests.get(f"{Get.__url}/current/last/results.json").json()
@@ -149,7 +153,8 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "FL", "Grid Pos", "Status"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
-    def DriverStandings(self, year="current") -> str:
+    @staticmethod
+    def DriverStandings(year="current") -> str:
         'Returns a tabulated str'
 
         json_file = requests.get(f"{Get.__url}/{year}/driverStandings.json").json()
@@ -165,7 +170,8 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
-    def ConstructorStandings(self, year="current") -> str:
+    @staticmethod
+    def ConstructorStandings(year="current") -> str:
         'Returns a tabulated str'
 
         json_file = requests.get(f"{Get.__url}/{year}/constructorStandings.json").json()
@@ -180,7 +186,8 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
-    def Calendar(self, year="current") -> str:
+    @staticmethod
+    def Calendar(year="current") -> str:
         'Returns a tabulated str'
 
         json_file = requests.get(f"{Get.__url}/{year}.json").json()

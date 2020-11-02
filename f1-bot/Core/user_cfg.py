@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*
+from __future__ import annotations
 import json
 from Core import Console
 from Core import converter as Converter
 from colorama import Fore
+from typing import cast
 
 
 class UserConfig:
@@ -17,26 +19,26 @@ class UserConfig:
 
     def save(self):
         'Saves this user config'
-        Converter.obj2json(self, "usr.cfg")
+        Converter.obj_to_json_file(self, "usr.cfg")
 
     def update(self, invar: dict):
         'Updates the user config with args'
         if invar is None:
-            return
+            Exception("invar is None")
 
         self.__dict__.update((k, v) for k, v in invar.items() if v is not None)
 
     @staticmethod
-    def load() -> object:
+    def load() -> UserConfig:
         'Loads user config and returns it as UserConfig class'
         try:
-            return Converter.json2obj("usr.cfg")
+            return cast(UserConfig, Converter.json_file_to_obj("usr.cfg"))
         except Exception as e:
             Console.error("UserConfig (load)", f"Load Error: {e}")
             return UserConfig.creation_ui("corrupted")
 
     @staticmethod
-    def creation_ui(txt="missing") -> object:
+    def creation_ui(txt="missing") -> UserConfig:
         'UI for creating a usr.cfg file. Returns the newly created UserConfig class.'
 
         Console.warning("UserConfig", f"'usr.cfg' file is {txt}!")

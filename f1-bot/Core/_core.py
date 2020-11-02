@@ -96,9 +96,11 @@ class Start:
 
     @staticmethod
     def splash_screen():
-        Console.printc(" _                       __       _             __ \n" +
-                       "| \\ o  _  _  _  __ _|   |_ /|    |_) _ _|_       _)\n" +
-                       "|_/ | _> (_ (_) | (_|   |   |    |_)(_) |_   \\_//__", Fore.LIGHTCYAN_EX)
+        Console.printc("    ____  _                          __   _________   ____        __          ___    ___ \n" +
+                       "   / __ \\(_)_____________  _________/ /  / ____<  /  / __ )____  / /_   _   _|__ \\  |__ \\\n" +
+                       "  / / / / / ___/ ___/ __ \\/ ___/ __  /  / /_   / /  / __  / __ \\/ __/  | | / /_/ /  __/ /\n" +
+                       " / /_/ / (__  ) /__/ /_/ / /  / /_/ /  / __/  / /  / /_/ / /_/ / /_    | |/ / __/_ / __/ \n" +
+                       "/_____/_/____/\\___/\\____/_/   \\__,_/  /_/    /_/  /_____/\\____/\\__/    |___/____(_)____/ ", Fore.LIGHTCYAN_EX)
 
     @staticmethod
     def load_args(version):
@@ -116,5 +118,5 @@ class Start:
         parser.add_option("-c", "--cache", dest="cache", help="Turn caching on/off (default: True)", metavar="True/False")
         parser.add_option("-C", "--cache_time_delta", dest="cache_time_delta", help="The time while the cached data is valid (default: 1800 sec)", metavar="CACHE_TIME_DELTA")
 
-        (options, args) = parser.parse_args()
+        options, args = parser.parse_args()
         return vars(options)

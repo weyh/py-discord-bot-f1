@@ -31,7 +31,7 @@ def __convert_to_dict(obj):
     return obj_dict
 
 
-def obj2json(obj: object, filename: str):
+def obj_to_json_file(obj: object, filename: str):
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(obj, f, default=__convert_to_dict, indent=4)
 
@@ -49,6 +49,6 @@ def __dict_to_obj(my_dict):
     return obj
 
 
-def json2obj(filename: str) -> object:
+def json_file_to_obj(filename: str) -> object:
     with open(filename, 'r') as json_data:
         return json.load(json_data, object_hook=__dict_to_obj)

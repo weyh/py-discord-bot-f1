@@ -23,7 +23,7 @@ class CacheManager:
     @staticmethod
     def load(type: str) -> Cache:
         'Loads json as Cache obj'
-        return cast(Cache, Converter.json2obj(f"./cache/{type}.json"))
+        return cast(Cache, Converter.json_file_to_obj(f"./cache/{type}.json"))
 
     @staticmethod
     def valid_cache_exists(type: str) -> bool:
@@ -39,7 +39,7 @@ class CacheManager:
         'Saves self'
         if not os.path.exists('./cache'):
             os.mkdir("cache")
-        Converter.obj2json(cache_obj, f"./cache/{cache_obj.type}.json")
+        Converter.obj_to_json_file(cache_obj, f"./cache/{cache_obj.type}.json")
 
     @staticmethod
     def clear():

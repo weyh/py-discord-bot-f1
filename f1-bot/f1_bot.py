@@ -6,7 +6,6 @@ import requests
 import time
 import discord
 from discord.ext import commands
-from bs4 import BeautifulSoup
 from datetime import datetime
 from tabulate import tabulate
 from stopwatch import Stopwatch
@@ -25,7 +24,9 @@ if Start("usr.cfg").is_first():
     USER_CFG: UserConfig = UserConfig.creation_ui()
 else:
     USER_CFG: UserConfig = UserConfig.load()
-USER_CFG.update(args)
+
+if args is not None:
+    USER_CFG.update(args)
 
 Console.debug = USER_CFG.debug
 Console.timestamp = USER_CFG.timestamp
@@ -38,7 +39,6 @@ HELP_LIST = [["Upcoming race weekend:", f"{USER_CFG.prefix}upcoming\n{USER_CFG.p
              ["Championship Calendar:", f"{USER_CFG.prefix}calendar"],
              ["Last Race Results:", f"{USER_CFG.prefix}last_race_results\n{USER_CFG.prefix}last_race\n{USER_CFG.prefix}lrr"],
              ["Last Qualifying Results:", f"{USER_CFG.prefix}last_qualifying_results\n{USER_CFG.prefix}last_qualifying\n{USER_CFG.prefix}lqr"],
-             ["News:", f"{USER_CFG.prefix}news"],
              ["Clear cache:", f"{USER_CFG.prefix}clear_cache"],
              ["Clear:", f"{USER_CFG.prefix}clear\n{USER_CFG.prefix}clean\n{USER_CFG.prefix}cls"],
              ["Uptime:", f"{USER_CFG.prefix}uptime"],
@@ -71,7 +71,7 @@ async def upcoming(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "upcoming", race_info)
-            c.save()
+            CacheManager.save(c)
 
     Console.log("upcoming", race_info)
     await send_msg(ctx, race_info)
@@ -94,7 +94,7 @@ async def following_week(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "following_week", race_info)
-            c.save()
+            CacheManager.save(c)
 
     Console.log("following_week", race_info)
     await send_msg(ctx, race_info)
@@ -116,7 +116,7 @@ async def driver_standings(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "driver_standings", ds)
-            c.save()
+            CacheManager.save(c)
 
     Console.log("driver_standings", ds)
     await send_msg(ctx, f"Driver Standings:\n```{ds}```")
@@ -139,7 +139,7 @@ async def constructors_standings(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "constructors_standings", cs)
-            c.save()
+            CacheManager.save(c)
 
     Console.log("constructors_standings", cs)
     await send_msg(ctx, f"Constructors Standings:\n```{cs}```")
@@ -162,7 +162,7 @@ async def calendar(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "calendar", _calendar)
-            c.save()
+            CacheManager.save(c)
 
     Console.log("calendar", _calendar)
     await send_msg(ctx, f"Calendar:\n```{_calendar}```")
@@ -185,7 +185,7 @@ async def last_race_results(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "last_race_results", '~$~'.join(i for i in lrr))
-            c.save()
+            CacheManager.save(c)
 
     Console.log("last_race_results", lrr[1])
     await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```{lrr[1]}```")
@@ -208,47 +208,12 @@ async def last_qualifying_results(ctx):
 
         if CacheManager.cache_enabled:
             c = Cache(str(datetime.now()), "last_qualifying_results", '~$~'.join(i for i in lqr))
-            c.save()
+            CacheManager.save(c)
 
     Console.log("last_qualifying_results", lqr[1])
     await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```{lqr[1]}```")
 
     Console.warning("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
-    sw.reset()
-
-
-@client.command(aliases=["short_news"])
-async def news(ctx):
-    Console.warning(f"user: {ctx.author}", "Started news")
-
-    sw = Stopwatch()
-    news = []
-
-    if is_site_up():
-        page = requests.get('https://www.autosport.com/f1')
-        soup = BeautifulSoup(page.content, 'html.parser')
-        news_soup = list(soup.find('div', class_='columnsContainer').find('div', 'leftColumn').find("div", class_="row small-up-2 medium-up-3").select("div div .newsitem"))[:3]
-
-        for n_soup in news_soup:
-            article_url = n_soup.find("a").get("href")
-            article_img = "http://" + n_soup.find("a").find("img").get("data-src")[2:]
-            article_title = article_url.split('/')[4].replace('-', ' ').capitalize()
-            article_description = n_soup.find("span", class_="sell").get_text()
-
-            embed = discord.Embed(title=article_title, colour=discord.Colour(0xff2800), url=str("https://www.autosport.com"+article_url), description=article_description)
-            embed.set_thumbnail(url=article_img)
-
-            news.append(embed)
-
-        Console.log("news", news)
-    else:
-        Console.error("SYS (news)", "Site is down")
-        news = "Error: Unable to reach https://www.autosport.com"
-
-    await send_msg(ctx, "News:")
-    await send_embed_msg(ctx, news)
-
-    Console.warning("SYS (news)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
