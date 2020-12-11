@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*
 from __future__ import annotations
-import json
 from Core import Console
 from Core import converter as Converter
 from colorama import Fore
@@ -8,8 +7,8 @@ from typing import cast
 
 
 class UserConfig:
-    def __init__(self, token: str, prefix: str, debug: bool, timestamp: bool, cache: bool, cache_time_delta: int):
-        self.version = "v2"
+    def __init__(self, version: str, token: str, prefix: str, debug: bool, timestamp: bool, cache: bool, cache_time_delta: int):
+        self.version = version
         self.token = token
         self.prefix = prefix
         self.debug = debug
@@ -26,6 +25,7 @@ class UserConfig:
         if invar is None:
             Exception("invar is None")
 
+        invar["version"] = None
         self.__dict__.update((k, v) for k, v in invar.items() if v is not None)
 
     @staticmethod
@@ -57,20 +57,20 @@ class UserConfig:
                 if token != "":
                     break
                 else:
-                    Console.printc("Token is not optional! Please enter your token.", Fore.LIGHTYELLOW_EX)
+                    Console.printc("Token is not optional! Please enter your token.", Fore.LIGHTRED_EX)
 
-            prefix = input("Prefix (default: '--'): ")
-            debug = input("Debug (True/False, default: False): ")
-            timestamp = input("Timestamp for console logs (True/False, default: False): ")
-            cache = input("Caching (True/False, default: True): ")
-            cache_td = input("Caching time delta (default: 1800 sec): ")
+            i_prefix = input("Prefix (default: '--'): ")
+            i_debug = input("Debug (True/False, default: False): ")
+            i_timestamp = input("Timestamp for console logs (True/False, default: False): ")
+            i_cache = input("Caching (True/False, default: True): ")
+            i_cache_td = input("Caching time delta (default: 1800 sec): ")
 
             # var validation
-            prefix = prefix if prefix != "" else "--"
-            debug = Converter.str2bool(debug)
-            timestamp = Converter.str2bool(timestamp)
-            cache = Converter.str2bool(cache)
-            cache_td = int(cache_td) if cache_td != "" else 1800
+            prefix = i_prefix if i_prefix != "" else "--"
+            debug = Converter.str2bool(i_debug)
+            timestamp = Converter.str2bool(i_timestamp)
+            cache = Converter.str2bool(i_cache) if i_cache != "" else True
+            cache_td = int(i_cache_td) if i_cache_td != "" else 1800
 
             print("-------------------------------------------------------------------\n" +
                   "Check if all values are correct!\n" +
@@ -83,7 +83,7 @@ class UserConfig:
                   "-------------------------------------------------------------------\n")
 
             if Console.yes_or_no("Save and continue (Y/n)? "):
-                usr_conf = UserConfig(token, prefix, debug, timestamp, cache, cache_td)
+                usr_conf = UserConfig("v2", token, prefix, debug, timestamp, cache, cache_td)
                 usr_conf.save()
                 print("DONE!")
                 return usr_conf

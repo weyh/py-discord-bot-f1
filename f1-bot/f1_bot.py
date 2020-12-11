@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-if __name__ != "__main__":
-    quit()
 
-import requests
 import time
 import discord
 from discord.ext import commands
 from datetime import datetime
 from tabulate import tabulate
 from stopwatch import Stopwatch
+from colorama import Fore
 
 from Core import *
 
-VERSION = "v2.2.0"
+VERSION = "v2.2.1"
 START_TIME = datetime.now()
 
 # args
@@ -51,7 +49,7 @@ client.remove_command("help")
 
 @client.event
 async def on_ready():
-    Console.clear()
+    # Console.clear()
     Console.log("SYS", "Bot is ready", True)
     Console.log("SYS", "Logging started...")
     print("-------------------------")
@@ -59,7 +57,7 @@ async def on_ready():
 
 @client.command(aliases=["coming_up"])
 async def upcoming(ctx):
-    Console.warning(f"user: {ctx.author}", "Started upcoming")
+    Console.printc(f"user: {ctx.author} Started upcoming", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -76,13 +74,13 @@ async def upcoming(ctx):
     Console.log("upcoming", race_info)
     await send_msg(ctx, race_info)
 
-    Console.warning("SYS (upcoming)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (upcoming)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command(aliases=["fw"])
 async def following_week(ctx):
-    Console.warning(f"user: {ctx.author}", "Started following_week")
+    Console.printc(f"user: {ctx.author} Started following_week", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -99,13 +97,13 @@ async def following_week(ctx):
     Console.log("following_week", race_info)
     await send_msg(ctx, race_info)
 
-    Console.warning("SYS (following_week)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (following_week)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command(aliases=["ds"])
 async def driver_standings(ctx):
-    Console.warning(f"user: {ctx.author}", "Started driver_standings")
+    Console.printc(f"user: {ctx.author} Started driver_standings", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
     if CacheManager.valid_cache_exists("driver_standings"):
@@ -121,13 +119,13 @@ async def driver_standings(ctx):
     Console.log("driver_standings", ds)
     await send_msg(ctx, f"Driver Standings:\n```{ds}```")
 
-    Console.warning("SYS (driver_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (driver_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command(aliases=["constructors", "cs"])
 async def constructors_standings(ctx):
-    Console.warning(f"user: {ctx.author}", "Started constructors_standings")
+    Console.printc(f"user: {ctx.author} Started constructors_standings", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -144,13 +142,13 @@ async def constructors_standings(ctx):
     Console.log("constructors_standings", cs)
     await send_msg(ctx, f"Constructors Standings:\n```{cs}```")
 
-    Console.warning("SYS (constructors_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (constructors_standings)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command()
 async def calendar(ctx):
-    Console.warning(f"user: {ctx.author}", "Started calendar")
+    Console.printc(f"user: {ctx.author} Started calendar", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -167,13 +165,13 @@ async def calendar(ctx):
     Console.log("calendar", _calendar)
     await send_msg(ctx, f"Calendar:\n```{_calendar}```")
 
-    Console.warning("SYS (calendar)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (calendar)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command(aliases=["last_race", "lrr"])
 async def last_race_results(ctx):
-    Console.warning(f"user: {ctx.author}", "Started last_race_results")
+    Console.printc(f"user: {ctx.author} Started last_race_results", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -190,13 +188,13 @@ async def last_race_results(ctx):
     Console.log("last_race_results", lrr[1])
     await send_msg(ctx, f"Last Race Results: {lrr[0]} \n```{lrr[1]}```")
 
-    Console.warning("SYS (last_race_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (last_race_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command(aliases=["last_qualifying", "lqr"])
 async def last_qualifying_results(ctx):
-    Console.warning(f"user: {ctx.author}", "Started last_qualifying_results")
+    Console.printc(f"user: {ctx.author} Started last_qualifying_results", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -213,14 +211,14 @@ async def last_qualifying_results(ctx):
     Console.log("last_qualifying_results", lqr[1])
     await send_msg(ctx, f"Last Qualifying Results: {lqr[0]} \n```{lqr[1]}```")
 
-    Console.warning("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (last_qualifying_results)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command()
 async def uptime(ctx):
     global START_TIME
-    Console.warning(f"user: {ctx.author}", "Started bwoah")
+    Console.printc(f"user: {ctx.author} Started uptime", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
@@ -229,26 +227,26 @@ async def uptime(ctx):
     Console.log("uptime", f"Uptime: {timedelta}")
     await send_msg(ctx, f"Uptime: ```json\n{timedelta}```")
 
-    Console.warning("SYS (uptime)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (uptime)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command()
 async def clear_cache(ctx):
-    Console.warning(f"user: {ctx.author}", "Started clear_cache")
+    Console.printc(f"user: {ctx.author} Started clear_cache", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
 
     CacheManager.clear()
     await send_msg(ctx, "Cache cleared!")
 
-    Console.warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (clear_cache)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
-@client.command(aliases=["clean", "cls"])
+@client.command()
 async def clear(ctx):
-    Console.warning(f"user: {ctx.author}", "Started clear")
+    Console.printc(f"user: {ctx.author} Started clear", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
     messages = await ctx.message.channel.history().flatten()
@@ -259,31 +257,30 @@ async def clear(ctx):
         if message.author.bot or message.content[:len(USER_CFG.prefix)] == USER_CFG.prefix:
             await message.delete()
 
-    Console.warning("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (clear)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command()
 async def help(ctx):
-    Console.warning(f"user: {ctx.author}", "Started help")
+    Console.printc(f"user: {ctx.author} Started help", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
     await ctx.channel.send(f"Help: ```{tabulate(HELP_LIST, headers=[' ', ' '], stralign='left', tablefmt='plain')}```")
 
-    Console.warning("SYS", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (help)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command()
 async def version(ctx):
-    Console.warning(f"user: {ctx.author}", "Started version")
+    Console.printc(f"user: {ctx.author} Started version", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
     await send_msg(ctx, f"```yaml\nVersion: {VERSION}\n```")
 
-    Console.warning("SYS (version)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
+    Console.log("SYS (version)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
-    return
 
 
 async def send_embed_msg(ctx, msg):
@@ -297,14 +294,16 @@ async def send_embed_msg(ctx, msg):
 async def send_msg(ctx, msg):
     await ctx.channel.send(msg)
 
-# region Logs
-Console.warning("Boot", f"Version: {VERSION}")
-Console.log("Boot", f"Token found: {len(USER_CFG.token) != 0}")
-Console.log("Boot", f"Prefix: {USER_CFG.prefix}")
-Console.log("Boot", f"Debug: {USER_CFG.debug}")
-Console.log("Boot", f"Cache: {USER_CFG.cache}")
-Console.log("Boot", f"Cache time delta: {USER_CFG.cache_time_delta} sec")
-Console.log("Boot", f"Time zone: {time.tzname[0]}")
-# endregion
 
-client.run(USER_CFG.token)
+if __name__ == "__main__":
+    # region Logs
+    Console.warning("Start", f"Version: {VERSION}")
+    Console.log("Start", f"Token found: {len(USER_CFG.token) != 0}")
+    Console.log("Start", f"Prefix: {USER_CFG.prefix}")
+    Console.log("Start", f"Debug: {USER_CFG.debug}")
+    Console.log("Start", f"Cache: {USER_CFG.cache}")
+    Console.log("Start", f"Cache time delta: {USER_CFG.cache_time_delta} sec")
+    Console.log("Start", f"Time zone: {time.tzname[0]}")
+    # endregion
+
+    client.run(USER_CFG.token)

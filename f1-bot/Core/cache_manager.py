@@ -2,7 +2,6 @@
 import os
 import shutil
 from datetime import datetime, timedelta
-from Core import Console
 from Core import converter as Converter
 from dataclasses import dataclass
 from typing import cast
