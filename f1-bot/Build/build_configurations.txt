@@ -1,0 +1,2 @@
+Linux: pyinstaller f1_bot_v2.py --onefile -c --hidden-import="f2_module.py" --workpath="./_temp" --distpath="./_build"
+Win: pyinstaller f1_bot_v2.py -n "F1Bot v2" --onefile --workpath="./_temp" --distpath="./_build" --win-private-assemblies -i icon.ico --version-file=file_version_info.txt

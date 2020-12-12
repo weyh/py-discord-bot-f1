@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 'Ergast Developer API Custom Wrapper'
 
-import requests, json, time
+import requests
+import json
 from collections import namedtuple
 from tabulate import tabulate
 from datetime import datetime
@@ -14,6 +15,7 @@ class Get:
     time_formats = {'date': "%Y-%m-%d", 'time': "%H:%M:%S", 'combined': "%Y-%m-%d %H:%M:%S", 'show': "%d %b", 'long': "%a %b %d %Y %H:%M:%S %Z%z"}
     __url = r"http://ergast.com/api/f1"
 
+    @staticmethod
     def Upcoming() -> str:
         'Returns the next race weekend'
         show_format_0 = "%a %d %b"
@@ -81,6 +83,7 @@ class Get:
 
         return race_info
 
+    @staticmethod
     def NextWeek() -> str:
         'Returns the race weekend after the upcoming one'
 
@@ -103,6 +106,7 @@ class Get:
 
         return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country", f"{country}"], tablefmt='plain')
 
+    @staticmethod
     def LastQualifyingResults() -> tuple:
         'Returns the place where the last qualifying was hosted and the data.'
 
@@ -123,6 +127,7 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "Q1", "Q2", "Q3"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
+    @staticmethod
     def LastRaceResults() -> tuple:
         'Returns the place where the last race was hosted and the data.'
 
@@ -147,6 +152,7 @@ class Get:
 
         return (circuit_name, tabulate(table, headers=["Pos", "Driver", "FL", "Grid Pos", "Status"], tablefmt='orgtbl', numalign="right", stralign="center"))
 
+    @staticmethod
     def DriverStandings(year="current") -> str:
         'Returns a tabulated str'
 
@@ -163,6 +169,7 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
+    @staticmethod
     def ConstructorStandings(year="current") -> str:
         'Returns a tabulated str'
 
@@ -178,6 +185,7 @@ class Get:
 
         return tabulate(table, headers=["Pos", "Driver", "Points"], tablefmt='orgtbl', numalign="right", stralign="center")
 
+    @staticmethod
     def Calendar(year="current") -> str:
         'Returns a tabulated str'
 
