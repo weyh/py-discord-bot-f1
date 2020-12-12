@@ -5,6 +5,7 @@ import shutil
 import sys
 import os
 from subprocess import call
+from time import sleep
 
 architecture = platform.uname().machine
 
@@ -32,22 +33,22 @@ def read_version():
     return all.split("VERSION")[1].split('"')[1]
 
 
-if not os.path.exists('./_temp'):
-    os.mkdir("_temp")
+if not os.path.exists('./temp'):
+    os.mkdir("temp")
 
 os.chdir("..")
 version = read_version()
 
 dirs = {
-    "workpath": "Build/_temp",
+    "workpath": "Build/temp",
     "distpath": "Build/bin",
     "ico": "Build/icon.ico",
-    "version-file": f"Build/_temp/file_version_info_{architecture}({version}).txt"
+    "version-file": f"Build/temp/file_version_info_{architecture}({version}).txt"
 }
 
 commands = {
-    "Linux": f'pyinstaller f1_bot.py -n "F1Bot" --onefile --workpath="./{dirs["workpath"]}/linux_{architecture}" --distpath="./{dirs["distpath"]}/linux_{architecture}"',
-    "Windows": f'pyinstaller f1_bot.py -n "F1Bot" --onefile --workpath="./{dirs["workpath"]}/win_{architecture}" --distpath="./{dirs["distpath"]}/win_{architecture}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
+    "Linux": f'pyinstaller f1_bot.py -n "F1Bot" --onefile --workpath="./{dirs["workpath"]}/{platform.system()}_{architecture}" --distpath="./{dirs["distpath"]}/{platform.system()}_{architecture}"',
+    "Windows": f'pyinstaller f1_bot.py -n "F1Bot" --onefile --workpath="./{dirs["workpath"]}/{platform.system()}_{architecture}" --distpath="./{dirs["distpath"]}/{platform.system()}_{architecture}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
 }
 
 print("---------")
@@ -69,12 +70,8 @@ os.chdir("..")
 
 print("Copying LICENSE and README...")
 
-if platform.system() == "Windows":
-    shutil.copy2('LICENSE', f"./f1-bot/{dirs['distpath']}/win_{architecture}/")
-    shutil.copy2('README.md', f"./f1-bot/{dirs['distpath']}/win_{architecture}/")
-else:
-    shutil.copy2('LICENSE', f"./f1-bot/{dirs['distpath']}/linux_{architecture}/")
-    shutil.copy2('README.md', f"./f1-bot/{dirs['distpath']}/linux_{architecture}/")
+shutil.copy2('LICENSE', f"./f1-bot/{dirs['distpath']}/{platform.system()}_{architecture}/")
+shutil.copy2('README.md', f"./f1-bot/{dirs['distpath']}/{platform.system()}_{architecture}/")
 
 print("Copying - Done!")
 print("Creating archive...")
@@ -83,11 +80,23 @@ root_dir = os.getcwd()
 if not os.path.exists(f"{root_dir}/f1-bot/Build/archive"):
     os.mkdir(f"{root_dir}/f1-bot/Build/archive")
 
-if platform.system() == "Windows":
-    os.chdir(f"./f1-bot/{dirs['distpath']}/win_{architecture}")
-    shutil.make_archive(f"{root_dir}/f1-bot/Build/archive/Windows_F1Bot_{version}_{architecture}", 'zip')
-else:
-    os.chdir(f"./f1-bot/{dirs['distpath']}/linux_{architecture}")
-    shutil.make_archive(f"{root_dir}/f1-bot/Build/archive/Linux_F1Bot_{version}_{architecture}", 'gztar')
+os.chdir(f"./f1-bot/{dirs['distpath']}/{platform.system()}_{architecture}")
+shutil.make_archive(f"{root_dir}/f1-bot/Build/archive/{platform.system()}_F1Bot_{version}_{architecture}", 'zip')
 
-print("Done!")
+print("Build Done!")
+sleep(1)
+print("Cleaning...")
+
+if os.path.exists(f"{root_dir}/f1-bot/Build/temp"):
+    shutil.rmtree(f"{root_dir}/f1-bot/Build/temp")
+
+if os.path.exists(f"{root_dir}/f1-bot/Core/__pycache__"):
+    shutil.rmtree(f"{root_dir}/f1-bot/Core/__pycache__")
+
+if os.path.exists(f"{root_dir}/f1-bot/__pycache__"):
+    shutil.rmtree(f"{root_dir}/f1-bot/__pycache__")
+
+if os.path.exists(f"{root_dir}/f1-bot/F1Bot.spec"):
+    os.remove(f"{root_dir}/f1-bot/F1Bot.spec")
+
+print("Cleaning Done!")

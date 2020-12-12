@@ -2,3 +2,7 @@
 cache
 __pycache__
 f1-bot/usr.cfg
+f1-bot/Build/temp
+f1-bot/Build/archive
+f1-bot/Build/bin
+*.spec

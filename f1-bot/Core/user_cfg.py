@@ -47,17 +47,18 @@ class UserConfig:
             raise Exception("'usr.cfg' file is missing! The application cannot be started!")
 
         while True:
-            Console.clear()
+            # Console.clear()
             Console.printc("Fields marked with '*' are essential!\n" +
                            "Other fields can be left empty.", Fore.LIGHTRED_EX)
 
             token = ""
             while True:
                 token = input("Token (*): ")
-                if token != "":
-                    break
-                else:
+
+                if token == "":
                     Console.printc("Token is not optional! Please enter your token.", Fore.LIGHTRED_EX)
+                else:
+                    break
 
             i_prefix = input("Prefix (default: '--'): ")
             i_debug = input("Debug (True/False, default: False): ")

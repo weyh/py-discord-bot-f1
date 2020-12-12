@@ -11,7 +11,7 @@ Gives information on upcoming or previous F1 events.
 
 2. After downloading the files, you need to create a [new discord application](https://discordapp.com/developers/applications/) and get the bot's token. *([Creating a discord bot & getting a token](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token))*
 
-3. If you have the token, you can start the bot. (On **Windows** simply open the .exe, on **Linux** `./F1Bot_v2` in the CLI. [Resolving problems with start.](#startup-problems)).
+3. If you have the token, you can start the bot. (On **Windows** simply open the .exe, on **Linux** `./F1Bot` in the CLI. [Resolving problems with start.](#startup-problems)).
 
 4. A `usr.cfg` file will be created during the initial start. The file contains the following parameters: token\*, prefix (default: "--"), debug (True/False, default: False), cache (default: True), cache_time_delta (default: 30 min).
 Parameters marked with '\*' are essential.
@@ -33,7 +33,7 @@ With command line arguments you can modify the settings of usr.cfg to that speci
 
 \*: The time while the cached data is valid.
 
-E.g: `f1_bot.py --prefix=-- -d -C 10`
+E.g: `python f1_bot.py --prefix=-- -d -C 10`
 In this case: **prefix:** "--", **debug:** True, **caching time delta:** 10 sec.
 
 ## Commands
@@ -95,7 +95,7 @@ python3 f1_bot.py
 
 ### Built With
 
-- [Python (3.9.x)](https://www.python.org)
+- [Python (3.8.x)](https://www.python.org)
 - [pyinstaller](https://www.pyinstaller.org)
 
 #### Packages used: [reqs.txt](reqs.txt)

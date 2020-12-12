@@ -51,7 +51,7 @@ client.remove_command("help")
 async def on_ready():
     # Console.clear()
     Console.log("SYS", "Bot is ready", True)
-    Console.log("SYS", "Logging started...")
+    Console.log("SYS", "Logging started!")
     print("-------------------------")
 
 

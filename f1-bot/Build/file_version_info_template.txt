@@ -30,9 +30,9 @@ StringFileInfo(
     StringStruct(u'FileVersion', u''),
     StringStruct(u'InternalName', u''),
     StringStruct(u'LegalCopyright', u''),
-    StringStruct(u'OriginalFilename', u'f1_bot_v2.py'),
+    StringStruct(u'OriginalFilename', u'f1_bot.py'),
     StringStruct(u'ProductName', u'Discord Formula 1'),
-    StringStruct(u'ProductVersion', u'2.1.1')])
+    StringStruct(u'ProductVersion', u'2.2.1')])
   ]),
 VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
