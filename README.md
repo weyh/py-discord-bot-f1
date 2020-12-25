@@ -95,7 +95,7 @@ python3 f1_bot.py
 
 ### Built With
 
-- [Python (3.8.x)](https://www.python.org)
+- [Python (3.7.x)](https://www.python.org)
 - [pyinstaller](https://www.pyinstaller.org)
 
 #### Packages used: [reqs.txt](reqs.txt)
