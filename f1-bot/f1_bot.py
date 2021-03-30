@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+from typing import Iterable, Union
 import discord
 from discord.ext import commands
 from datetime import datetime
@@ -10,7 +11,7 @@ from colorama import Fore
 
 from Core import *
 
-VERSION = "v2.2.1"
+VERSION = "v2.2.2"
 START_TIME = datetime.now()
 
 # args
@@ -56,7 +57,7 @@ async def on_ready():
 
 
 @client.command(aliases=["coming_up"])
-async def upcoming(ctx):
+async def upcoming(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started upcoming", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -79,7 +80,7 @@ async def upcoming(ctx):
 
 
 @client.command(aliases=["fw"])
-async def following_week(ctx):
+async def following_week(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started following_week", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -102,7 +103,7 @@ async def following_week(ctx):
 
 
 @client.command(aliases=["ds"])
-async def driver_standings(ctx):
+async def driver_standings(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started driver_standings", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -124,7 +125,7 @@ async def driver_standings(ctx):
 
 
 @client.command(aliases=["constructors", "cs"])
-async def constructors_standings(ctx):
+async def constructors_standings(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started constructors_standings", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -147,7 +148,7 @@ async def constructors_standings(ctx):
 
 
 @client.command()
-async def calendar(ctx):
+async def calendar(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started calendar", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -170,7 +171,7 @@ async def calendar(ctx):
 
 
 @client.command(aliases=["last_race", "lrr"])
-async def last_race_results(ctx):
+async def last_race_results(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started last_race_results", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -193,7 +194,7 @@ async def last_race_results(ctx):
 
 
 @client.command(aliases=["last_qualifying", "lqr"])
-async def last_qualifying_results(ctx):
+async def last_qualifying_results(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started last_qualifying_results", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -216,7 +217,7 @@ async def last_qualifying_results(ctx):
 
 
 @client.command()
-async def uptime(ctx):
+async def uptime(ctx: commands.Context):
     global START_TIME
     Console.printc(f"user: {ctx.author} Started uptime", Fore.LIGHTBLUE_EX)
 
@@ -232,7 +233,7 @@ async def uptime(ctx):
 
 
 @client.command()
-async def clear_cache(ctx):
+async def clear_cache(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started clear_cache", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -245,7 +246,7 @@ async def clear_cache(ctx):
 
 
 @client.command()
-async def clear(ctx):
+async def clear(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started clear", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -262,18 +263,18 @@ async def clear(ctx):
 
 
 @client.command()
-async def help(ctx):
+async def help(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started help", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
-    await ctx.channel.send(f"Help: ```{tabulate(HELP_LIST, headers=[' ', ' '], stralign='left', tablefmt='plain')}```")
+    await ctx.send(f"Help: ```{tabulate(HELP_LIST, headers=[' ', ' '], stralign='left', tablefmt='plain')}```")
 
     Console.log("SYS (help)", "Total time taken: " + str(round(sw.duration*1000)) + " ms")
     sw.reset()
 
 
 @client.command()
-async def version(ctx):
+async def version(ctx: commands.Context):
     Console.printc(f"user: {ctx.author} Started version", Fore.LIGHTBLUE_EX)
 
     sw = Stopwatch()
@@ -283,16 +284,16 @@ async def version(ctx):
     sw.reset()
 
 
-async def send_embed_msg(ctx, msg):
+async def send_embed_msg(ctx: commands.Context, msg: Union[str, Iterable]):
     if isinstance(msg, list):
         for m in msg:
-            await ctx.channel.send(embed=m)
+            await ctx.send(embed=m)
     else:
-        await ctx.channel.send(embed=msg)
+        await ctx.send(embed=msg)
 
 
-async def send_msg(ctx, msg):
-    await ctx.channel.send(msg)
+async def send_msg(ctx: commands.Context, msg: str):
+    await ctx.send(msg)
 
 
 if __name__ == "__main__":

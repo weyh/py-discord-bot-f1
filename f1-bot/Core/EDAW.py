@@ -18,29 +18,8 @@ class Get:
     @staticmethod
     def Upcoming() -> str:
         'Returns the next race weekend'
-        show_format_0 = "%a %d %b"
-        show_format_1 = "%H:%M"
         current_date = datetime.now()
 
-        # getting data from autosport
-        page = requests.get('https://www.autosport.com/f1')
-        soup = BeautifulSoup(page.content, 'html.parser')
-        coming_up_div = soup.find_all('div', class_='stats')[1]
-
-        schedule_start = [d.find("td", class_="text-right").get("data-start") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
-        schedule_end = [d.find("td", class_="text-right").get("data-end") for d in coming_up_div.find("div", class_='time-convert').find("table").find("tbody").find_all("tr")]
-
-        free_practices_start = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_start[:3]]
-        free_practices_end = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_end[:3]]
-        qualifyings_start = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_start[3:6]]
-        qualifyings_end = [Conv.to_local_timzone(datetime.strptime(d, Get.time_formats['long'])) for d in schedule_end[3:6]]
-        race_start = Conv.to_local_timzone(datetime.strptime(schedule_start[6], Get.time_formats['long']))
-        race_end = Conv.to_local_timzone(datetime.strptime(schedule_end[6], Get.time_formats['long']))
-
-        race_starts_in = str(race_start - Conv.to_local_timzone(datetime.utcnow())).split('.')[0]
-        track_info = [d.get_text() for d in coming_up_div.select("ul li")][2].split(': ')[1]
-
-        # getting data from api
         json_file = requests.get(f"{Get.__url}/current.json").json()
         races_json = json2obj(json_file)["MRData"]['RaceTable']['Races']
 
@@ -50,38 +29,13 @@ class Get:
                 if _race['Circuit']['Location']['country'] == "UAE":
                     return "End of session"
                 else:
-                    race = races_json[i+1]
+                    race = races_json[i + 1]
 
         country = race['Circuit']['Location']['country']
         date = datetime.strptime(race['date'], Get.time_formats['date']).strftime(Get.time_formats['show'])
         circuit_name = race['Circuit']['circuitName']
 
-        race_info = f"Country: {country}\n"
-        race_info += f"Circuit: {circuit_name} ({track_info})\n"
-
-        race_info += f"Date: {date} ({race_starts_in})\n\n"
-        race_info += "Schedule:\n"
-
-        table = []
-
-        for i in range(3):
-            table.append([f"FP{i+1}", f"{free_practices_start[i].strftime(show_format_0)}",
-                          f"{free_practices_start[i].strftime(show_format_1)}", f"{free_practices_end[i].strftime(show_format_1)}"])
-
-        table.append(["", "", "", ""])
-
-        for i in range(3):
-            table.append([f"Q{i+1}", f"{qualifyings_start[i].strftime(show_format_0)}",
-                          f"{qualifyings_start[i].strftime(show_format_1)}", f"{qualifyings_end[i].strftime(show_format_1)}"])
-
-        table.append(["", "", "", ""])
-        table.append(["Race", f"{race_start.strftime(show_format_0)}",
-                      f"{race_start.strftime(show_format_1)}", f"{race_end.strftime(show_format_1)}"])
-
-        race_info += tabulate(table, headers=["", "Date", "Starts",
-                                              "Ends"], tablefmt='simple', stralign="center")
-
-        return race_info
+        return tabulate([["Circuit", f"{circuit_name}"], ["Date", f"{date}"]], headers=["Country", f"{country}"], tablefmt='plain')
 
     @staticmethod
     def NextWeek() -> str:
