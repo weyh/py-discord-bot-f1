@@ -3,7 +3,7 @@ import sys
 import os
 import platform
 from datetime import datetime
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 
 init(autoreset=True)
 

@@ -1,0 +1,8 @@
+﻿requests>=2.25.0, <3.0
+discord-py>=1.5.1, <2.0
+tabulate>=0.8.7
+stopwatch.py>=1.0.1
+colorama>=0.4.4
+fastf1>=2.2.7, <3.0
+whenareyou @ git+https://github.com/FObersteiner/whenareyou.git@98429012860183e619aa56fbc7c6140d83d0fa15
+tzlocal>=2.1

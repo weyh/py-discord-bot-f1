@@ -17,10 +17,10 @@ class Start:
 
     @staticmethod
     def splash_screen():
-        Console.printc(" ___  _                   _   ___ _   ___      _         ___   ___ \n" +
-                       "|   \\(_)___ __ ___ _ _ __| | | __/ | | _ ) ___| |_  __ _|_  ) |_  )\n" +
-                       "| |) | (_-</ _/ _ \\ '_/ _` | | _|| | | _ \\/ _ \\  _| \\ V // / _ / / \n" +
-                       "|___/|_/__/\\__\\___/_| \\__,_| |_| |_| |___/\\___/\\__|  \\_//___(_)___|", Fore.LIGHTCYAN_EX)
+        Console.printc(" ___  _                   _   ___ _ ___      _         ____\n" +
+                       "|   \\(_)___ __ ___ _ _ __| | | __/ | _ ) ___| |_  __ _|__ /\n" +
+                       "| |) | (_-</ _/ _ \\ '_/ _` | | _|| | _ \\/ _ \\  _| \\ V /|_ \\\n" +
+                       "|___/|_/__/\\__\\___/_| \\__,_| |_| |_|___/\\___/\\__|  \\_/|___/", Fore.LIGHTCYAN_EX)
 
     @staticmethod
     def load_args(version):
@@ -34,9 +34,6 @@ class Start:
 
         parser.add_option("-d", "--debug", dest="debug", action="store_true", help="Turn debug mode on/off (default: False)", metavar="True/False")
         parser.add_option("-T", "--timestamp", dest="timestamp", action="store_true", help="Turn timestamp on/off (default: False)", metavar="True/False")
-
-        parser.add_option("-c", "--cache", dest="cache", help="Turn caching on/off (default: True)", metavar="True/False")
-        parser.add_option("-C", "--cache_time_delta", dest="cache_time_delta", help="The time while the cached data is valid (default: 1800 sec)", metavar="CACHE_TIME_DELTA")
 
         options, args = parser.parse_args()
         return vars(options)

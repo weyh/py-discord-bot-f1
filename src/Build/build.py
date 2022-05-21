@@ -2,7 +2,6 @@
 # just an ugly script nothing else
 import platform
 import shutil
-import sys
 import os
 from subprocess import call
 from time import sleep
@@ -47,8 +46,8 @@ dirs = {
 }
 
 commands = {
-    "Linux": f'pyinstaller f1_bot.py -n "F1Bot" --onefile --workpath="./{dirs["workpath"]}/{platform.system()}_{architecture}" --distpath="./{dirs["distpath"]}/{platform.system()}_{architecture}"',
-    "Windows": f'pyinstaller f1_bot.py -n "F1Bot" --onefile --workpath="./{dirs["workpath"]}/{platform.system()}_{architecture}" --distpath="./{dirs["distpath"]}/{platform.system()}_{architecture}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
+    "Linux": f'pyinstaller f1_bot.py -n "F1Bot" --collect-data whenareyou --onefile --workpath="./{dirs["workpath"]}/{platform.system()}_{architecture}" --distpath="./{dirs["distpath"]}/{platform.system()}_{architecture}"',
+    "Windows": f'pyinstaller f1_bot.py -n "F1Bot" --collect-data whenareyou --onefile --workpath="./{dirs["workpath"]}/{platform.system()}_{architecture}" --distpath="./{dirs["distpath"]}/{platform.system()}_{architecture}" --win-private-assemblies -i "./{dirs["ico"]}" --version-file="./{dirs["version-file"]}"'
 }
 
 print("---------")
@@ -70,33 +69,33 @@ os.chdir("..")
 
 print("Copying LICENSE and README...")
 
-shutil.copy2('LICENSE', f"./f1-bot/{dirs['distpath']}/{platform.system()}_{architecture}/")
-shutil.copy2('README.md', f"./f1-bot/{dirs['distpath']}/{platform.system()}_{architecture}/")
+shutil.copy2('LICENSE', f"./src/{dirs['distpath']}/{platform.system()}_{architecture}/")
+shutil.copy2('README.md', f"./src/{dirs['distpath']}/{platform.system()}_{architecture}/")
 
 print("Copying - Done!")
 print("Creating archive...")
 
 root_dir = os.getcwd()
-if not os.path.exists(f"{root_dir}/f1-bot/Build/archive"):
-    os.mkdir(f"{root_dir}/f1-bot/Build/archive")
+if not os.path.exists(f"{root_dir}/src/Build/archive"):
+    os.mkdir(f"{root_dir}/src/Build/archive")
 
-os.chdir(f"./f1-bot/{dirs['distpath']}/{platform.system()}_{architecture}")
-shutil.make_archive(f"{root_dir}/f1-bot/Build/archive/{platform.system()}_F1Bot_{version}_{architecture}", 'zip')
+os.chdir(f"./src/{dirs['distpath']}/{platform.system()}_{architecture}")
+shutil.make_archive(f"{root_dir}/src/Build/archive/{platform.system()}_F1Bot_{version}_{architecture}", 'zip')
 
 print("Build Done!")
 sleep(1)
 print("Cleaning...")
 
-if os.path.exists(f"{root_dir}/f1-bot/Build/temp"):
-    shutil.rmtree(f"{root_dir}/f1-bot/Build/temp")
+if os.path.exists(f"{root_dir}/src/Build/temp"):
+    shutil.rmtree(f"{root_dir}/src/Build/temp")
 
-if os.path.exists(f"{root_dir}/f1-bot/Core/__pycache__"):
-    shutil.rmtree(f"{root_dir}/f1-bot/Core/__pycache__")
+if os.path.exists(f"{root_dir}/src/Core/__pycache__"):
+    shutil.rmtree(f"{root_dir}/src/Core/__pycache__")
 
-if os.path.exists(f"{root_dir}/f1-bot/__pycache__"):
-    shutil.rmtree(f"{root_dir}/f1-bot/__pycache__")
+if os.path.exists(f"{root_dir}/src/__pycache__"):
+    shutil.rmtree(f"{root_dir}/src/__pycache__")
 
-if os.path.exists(f"{root_dir}/f1-bot/F1Bot.spec"):
-    os.remove(f"{root_dir}/f1-bot/F1Bot.spec")
+if os.path.exists(f"{root_dir}/src/F1Bot.spec"):
+    os.remove(f"{root_dir}/src/F1Bot.spec")
 
 print("Cleaning Done!")

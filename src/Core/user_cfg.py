@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*
 from __future__ import annotations
 from Core import Console
-from Core import converter as Converter
+from Core import converter as conv
 from colorama import Fore
-from typing import cast
+import configparser as cfgpar
+
+UCFG_VERSION = "v3"
 
 
 class UserConfig:
-    def __init__(self, version: str, token: str, prefix: str, debug: bool, timestamp: bool, cache: bool, cache_time_delta: int):
+    def __init__(self, version: str, token: str, prefix: str, debug: bool, timestamp: bool, temp_dir: str):
         self.version = version
         self.token = token
         self.prefix = prefix
         self.debug = debug
         self.timestamp = timestamp
-        self.cache = cache
-        self.cache_time_delta = cache_time_delta
+        self.temp_dir = temp_dir
 
     def save(self):
         'Saves this user config'
-        Converter.obj_to_json_file(self, "usr.cfg")
+
+        cfg = cfgpar.ConfigParser()
+        cfg["UserConfig"] = self.__dict__
+        with open("usr.cfg", "w") as f:
+            cfg.write(f)
 
     def update(self, invar: dict):
         'Updates the user config with args'
@@ -29,15 +34,46 @@ class UserConfig:
         self.__dict__.update((k, v) for k, v in invar.items() if v is not None)
 
     @staticmethod
+    def __from_cfg(file: str) -> UserConfig | None:
+        cfg = cfgpar.ConfigParser()
+        cfg.read(file)
+
+        if not cfg.has_section("UserConfig"):
+            return None
+        if not cfg.has_option("UserConfig", "token"):
+            return None
+
+        v = UCFG_VERSION
+        if cfg.has_option("UserConfig", "version"):
+            v = cfg.get("UserConfig", "version")
+
+        ucfg = UserConfig(v, cfg["UserConfig"]["token"], "--", False, False, "./temp")
+
+        if cfg.has_option("UserConfig", "prefix"):
+            ucfg.prefix = cfg["UserConfig"]["prefix"]
+        if cfg.has_option("UserConfig", "debug"):
+            ucfg.debug = conv.str2bool(cfg["UserConfig"]["debug"])
+        if cfg.has_option("UserConfig", "timestamp"):
+            ucfg.timestamp = conv.str2bool(cfg["UserConfig"]["timestamp"])
+        if cfg.has_option("UserConfig", "temp_dir"):
+            ucfg.temp_dir = cfg["UserConfig"]["temp_dir"]
+
+        return ucfg
+
+    @ staticmethod
     def load() -> UserConfig:
         'Loads user config and returns it as UserConfig class'
-        try:
-            return cast(UserConfig, Converter.json_file_to_obj("usr.cfg"))
-        except Exception as e:
-            Console.error("UserConfig (load)", f"Load Error: {e}")
-            return UserConfig.creation_ui("corrupted")
 
-    @staticmethod
+        ucfg: UserConfig | None
+        ucfg = UserConfig.__from_cfg("usr.cfg")
+
+        if ucfg is None:
+            Console.error("UserConfig (load)", f"Load Error: UserConfig cannot be parsed")
+            ucfg = UserConfig.creation_ui("corrupted")
+
+        return ucfg
+
+    @ staticmethod
     def creation_ui(txt="missing") -> UserConfig:
         'UI for creating a usr.cfg file. Returns the newly created UserConfig class.'
 
@@ -63,28 +99,25 @@ class UserConfig:
             i_prefix = input("Prefix (default: '--'): ")
             i_debug = input("Debug (True/False, default: False): ")
             i_timestamp = input("Timestamp for console logs (True/False, default: False): ")
-            i_cache = input("Caching (True/False, default: True): ")
-            i_cache_td = input("Caching time delta (default: 1800 sec): ")
+            temp_dir = input("Full path to temp directory (default: './tmp'): ")
 
             # var validation
             prefix = i_prefix if i_prefix != "" else "--"
-            debug = Converter.str2bool(i_debug)
-            timestamp = Converter.str2bool(i_timestamp)
-            cache = Converter.str2bool(i_cache) if i_cache != "" else True
-            cache_td = int(i_cache_td) if i_cache_td != "" else 1800
+            debug = conv.str2bool(i_debug)
+            timestamp = conv.str2bool(i_timestamp)
+            temp_dir = temp_dir if temp_dir != "" else "./tmp"
 
             print("-------------------------------------------------------------------\n" +
                   "Check if all values are correct!\n" +
                   f"token={token}\n" +
                   f"prefix={prefix}\n" +
                   f"debug={debug}\n" +
-                  f"timestamp={timestamp}\n" +
-                  f"caching={cache}\n" +
-                  f"cache_time_delta={cache_td}\n" +
+                  f"timestamp={timestamp}\n"
+                  f"temp_dir={temp_dir}\n" +
                   "-------------------------------------------------------------------\n")
 
             if Console.yes_or_no("Save and continue (Y/n)? "):
-                usr_conf = UserConfig("v2", token, prefix, debug, timestamp, cache, cache_td)
+                usr_conf = UserConfig(UCFG_VERSION, token, prefix, debug, timestamp, temp_dir)
                 usr_conf.save()
                 print("DONE!")
                 return usr_conf
